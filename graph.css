@@ -1,0 +1,64 @@
+svg {
+	width: 100%;
+	height: 400px;
+	cursor: all-scroll;
+}
+
+circle {
+	transition: opacity 100ms ease;
+/*
+	stroke: #364E64;
+	stroke-width: 0.1;
+*/
+	cursor: pointer;
+}
+circle.asset {
+/*
+	stroke: red;
+*/
+	
+}
+line {
+	transition: stroke 80ms ease;
+	stroke: #364E64;
+	stroke-width: .8;
+	cursor: alias;
+}
+/*
+#markerArrow {
+*/
+marker {
+	fill: #364E64;
+}
+marker#arrowTimealert {
+	fill: red;
+}
+line.timealert {
+	stroke: red;
+/*
+	animation: blinker 1s linear infinite;
+*/
+	-webkit-animation: blinker 1s linear infinite;
+}
+/*
+line.red marker {
+	fill: red !important;
+}
+*/
+line:hover {
+	stroke: orange;
+}
+
+circle:hover {
+	opacity: 0.7;
+}
+@keyframes blinker {
+	0% { opacity: 1.0; }
+	50% { opacity: 0.0; }
+	100% { opacity: 1.0; }
+}
+@-webkit-keyframes blinker {
+	0% { opacity: 1.0; }
+	50% { opacity: 0.0; }
+	100% { opacity: 1.0; }
+}

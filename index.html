@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+		<link rel="stylesheet" type="text/css" href="graph.css"/>
+		<script src="springy.js"></script>
+		<script src="graph.js"></script>
+		<script src="svg-pan-zoom.js"></script>
+		<script type="text/javascript">//<![CDATA[ 
+			document.addEventListener('DOMContentLoaded', function() {
+				fetchJSONFile('example.json', function(data){
+					svg = damassvggraph.getSVG();
+					document.getElementById('graph').appendChild( svg );
+					//svgPanZoom.init();
+					//window.svgpanzoominstance = svgPanZoom('#svggraph', { fit: false, zoom: 2 } );
+					window.svgpanzoominstance = svgPanZoom('#svggraph' );
+					//var springy_graph = springy_damas.get_springy_graph( value );
+					springy_graph = new Springy.Graph();
+					nodes = {};
+					edges = {};
+					for(i=0;i<data['nodes'].length;i++)
+					{
+						var n = data['nodes'][i];
+						nodes[n.id] = springy_graph.newNode(n);
+					}
+					for(i=0;i<data['links'].length;i++)
+					{
+						var l = data['links'][i];
+						edges[l.link_id] = springy_graph.newEdge( nodes[l['tgt_id']], nodes[l['src_id']] );
+					}
+					var springy_layout = new Springy.Layout.ForceDirected(springy_graph, 150.0, 250.0, 0.5);
+					springy_damas.currentBB = springy_layout.getBoundingBox();
+					springy_damas.svg = svg;
+					var springy_renderer = springy_damas.get_renderer( springy_layout );
+					springy_renderer.start();
+				});
+			});
+			function fetchJSONFile(path, callback) {
+				var httpRequest = new XMLHttpRequest();
+				httpRequest.onreadystatechange = function() {
+					if (httpRequest.readyState === 4) {
+						//if (httpRequest.status === 200) {
+						var data = JSON.parse(httpRequest.responseText);
+						if (callback) callback(data);
+						//}
+					}
+				};
+				httpRequest.open('GET', path);
+				httpRequest.send(); 
+			}
+                //]]>
+        </script>
+
+        </head>
+        <body>
+		<div id="graph"></div>
+	</body>
+</html>
+
