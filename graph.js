@@ -343,8 +343,9 @@ springy_damas.get_renderer = function( layout )
 					//e.clientX
 				});
 */
-				circle.addEventListener( 'click', eventHandler);
+				//circle.addEventListener( 'click', eventHandler);
 				circle.addEventListener( 'click', function(e){
+					assetOverlay(this.data);
 					// we separate with a global function
 					//alert(this.data.keys.file);
 					//NODE_CLICK.call(this, e);
