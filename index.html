@@ -33,7 +33,11 @@
 					springy_damas.svg = svg;
 					var springy_renderer = springy_damas.get_renderer( springy_layout );
 					springy_renderer.start();
+					svg.style.height = window.innerHeight -4 + 'px';
 				});
+			});
+			window.addEventListener("resize", function() {
+				svg.style.height = window.innerHeight -4 + 'px';
 			});
 			function fetchJSONFile(path, callback) {
 				var httpRequest = new XMLHttpRequest();
@@ -50,6 +54,11 @@
 			}
                 //]]>
         </script>
+	<style>
+		body {
+			margin: 0;
+		}
+	</style>
 
         </head>
         <body>
