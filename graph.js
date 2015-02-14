@@ -1,6 +1,6 @@
 springy_damas = {
-	ray: 6,
-	edge_distance: 6,
+	ray: 12,
+	edge_distance: 12,
 	graph_all_nodes : []
 };
 
@@ -246,6 +246,13 @@ springy_damas.get_renderer = function( layout )
 					title.appendChild(titleText);
 					circle.appendChild(title);
 				}
+				if( node.data.keys.name )
+				{
+					var title = document.createElementNS("http://www.w3.org/2000/svg", 'title');
+					var titleText = document.createTextNode(node.data.keys.name);
+					title.appendChild(titleText);
+					circle.appendChild(title);
+				}
 				node.shape = circle;
 				circle.node = node;
 				circle.point = p;
@@ -343,15 +350,10 @@ springy_damas.get_renderer = function( layout )
 					//e.clientX
 				});
 */
-				//circle.addEventListener( 'click', eventHandler);
 				circle.addEventListener( 'click', function(e){
-					assetOverlay(this.data);
-					// we separate with a global function
-					//alert(this.data.keys.file);
-					//NODE_CLICK.call(this, e);
-					//document.dispatch('assetShow');
-					//eventHandler.call(this, e);
-					
+					if(window['assetOverlay']){
+						assetOverlay(this.data);
+					}
 				}.bind(node));
 			}
 			var s = springy_damas.toScreen(p); 

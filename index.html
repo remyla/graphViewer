@@ -6,12 +6,12 @@
 		<script src="springy.js"></script>
 		<script src="graph.js"></script>
 		<script src="svg-pan-zoom.js"></script>
+		<script src="interactions.js"></script>
 		<script type="text/javascript">//<![CDATA[ 
 			document.addEventListener('DOMContentLoaded', function() {
 				fetchJSONFile('example.json', function(data){
 					svg = damassvggraph.getSVG();
 					document.getElementById('graph').appendChild( svg );
-					//svgPanZoom.init();
 					//window.svgpanzoominstance = svgPanZoom('#svggraph', { fit: false, zoom: 2 } );
 					window.svgpanzoominstance = svgPanZoom('#svggraph' );
 					//var springy_graph = springy_damas.get_springy_graph( value );
@@ -34,24 +34,12 @@
 					var springy_renderer = springy_damas.get_renderer( springy_layout );
 					springy_renderer.start();
 					svg.style.height = window.innerHeight -4 + 'px';
+					enable_drop(svg, springy_graph);
 				});
 			});
 			window.addEventListener("resize", function() {
 				svg.style.height = window.innerHeight -4 + 'px';
 			});
-			function fetchJSONFile(path, callback) {
-				var httpRequest = new XMLHttpRequest();
-				httpRequest.onreadystatechange = function() {
-					if (httpRequest.readyState === 4) {
-						//if (httpRequest.status === 200) {
-						var data = JSON.parse(httpRequest.responseText);
-						if (callback) callback(data);
-						//}
-					}
-				};
-				httpRequest.open('GET', path);
-				httpRequest.send(); 
-			}
                 //]]>
         </script>
 	<style>
