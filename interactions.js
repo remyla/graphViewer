@@ -32,9 +32,11 @@ function enable_drop( svg, graph ) {
 		e.preventDefault();
 	}
 	svg.ondrop = function(e){
+		alert('COMING SOON :) Drop your assets and connect them, in this web page');
 		//alert( e.dataTransfer.getData('Text'));
 		e.stopPropagation();
 		if(e.preventDefault) e.preventDefault();
+		return;
 		//alert('ondrop');
 		console.log(e.dataTransfer);
 		console.log(e.dataTransfer.files);
@@ -56,6 +58,15 @@ function enable_drop( svg, graph ) {
 		var types = e.dataTransfer.types;
 		if(e.dataTransfer.types)
 		{
+			var keys = {};
+			for(i=0;i<e.dataTransfer.types.length;i++)
+			{
+				console.log(e.dataTransfer.types[i]);
+				keys[e.dataTransfer.types[i]] = e.dataTransfer.getData(e.dataTransfer.types[i]);
+			}
+			
+			graph.newNode({ keys: keys});
+			//graph.newNode(keys);
 			// DROP EXISTING NODE
 /*
 			var text = e.dataTransfer.getData('Text');
@@ -82,6 +93,15 @@ function enable_drop( svg, graph ) {
 			}
 */
 		}
+		var data = e.dataTransfer.getData("text");
+		console.log(data);
+		var data = e.dataTransfer.getData("text/uri-list");
+		console.log(data);
+		var data = e.dataTransfer.getData("text/html");
+		console.log(data);
+
+
+		
 	}
 }
 

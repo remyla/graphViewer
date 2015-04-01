@@ -236,6 +236,7 @@ springy_damas.get_renderer = function( layout )
 			{
 				a = document.createElementNS("http://www.w3.org/2000/svg", 'a');
 				a.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#' + node.data.id );
+				//a.setAttributeNS('http://www.w3.org/1999/xlink', 'href', node.data.keys.file );
 				//a.setAttribute('title', escape(JSON.stringify(node.data)));
 				var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
 				//var txt = JSON.stringify(node.data);
