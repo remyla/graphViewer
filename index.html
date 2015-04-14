@@ -4,33 +4,56 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 		<link rel="stylesheet" type="text/css" href="graph.css"/>
 		<script src="d3.min.js"></script>
-		<script src="graph_mat.js"></script>
+		<script src="springy.js"></script>
+		<script src="graph.js"></script>
+		<script src="svg-pan-zoom.js"></script>
 		<script src="interactions.js"></script>
 		<script type="text/javascript">//<![CDATA[ 
-		
-		document.addEventListener('DOMContentLoaded', function() {
-			svg = damassvggraph.getSVG();
-			
-			var svgD = document.getElementById('graph');
-			svgD.style.height = window.innerHeight + 'px';
-			svgD.style.width = window.innerWidth + 'px';
-			
-			var backD = document.getElementById('backG');
-			backD.setAttribute('height', window.innerHeight + 'px');
-			backD.setAttribute('width', window.innerWidth + 'px');	
-		});
-			
-		window.addEventListener("resize", function() {
-			var svgD = document.getElementById('graph');
-			svgD.style.height = window.innerHeight + 'px';
-			svgD.style.width = window.innerWidth + 'px';
-		});
-			//]]>
-		</script>
+			document.addEventListener('DOMContentLoaded', function() {
+				fetchJSONFile('example.json', function(data){
+					svg = damassvggraph.getSVG();
+					document.getElementById('graph').appendChild( svg );
+					//window.svgpanzoominstance = svgPanZoom('#svggraph', { fit: false, zoom: 2 } );
+					window.svgpanzoominstance = svgPanZoom('#svggraph' );
+					//var springy_graph = springy_damas.get_springy_graph( value );
+					springy_graph = new Springy.Graph();
+					nodes = {};
+					edges = {};
+					for(i=0;i<data['nodes'].length;i++)
+					{
+						var n = data['nodes'][i];
+						nodes[n.id] = springy_graph.newNode(n);
+					}
+					for(i=0;i<data['links'].length;i++)
+					{
+						var l = data['links'][i];
+						edges[l.link_id] = springy_graph.newEdge( nodes[l['tgt_id']], nodes[l['src_id']] );
+					}
+					var springy_layout = new Springy.Layout.ForceDirected(springy_graph, 150.0, 250.0, 0.5);
+					springy_damas.currentBB = springy_layout.getBoundingBox();
+					springy_damas.svg = svg;
+					var springy_renderer = springy_damas.get_renderer( springy_layout );
+					springy_renderer.start();
+					svg.style.height = window.innerHeight -4 + 'px';
+					enable_drop(svg, springy_graph);
+				});
+			});
+			window.addEventListener("resize", function() {
+				svg.style.height = window.innerHeight -4 + 'px';
+			});
+                //]]>
+        </script>
+	<style>
+		body {
+			margin: 0;
+		}
 
-	</head>
-	<body>
-		<div id="graph"></div>
+	</style>
+
+        </head>
+        <body>
+		<div id="graph">
+		</div>
 	</body>
 </html>
 
