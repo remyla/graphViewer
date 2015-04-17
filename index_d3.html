@@ -2,29 +2,40 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-		<link rel="stylesheet" type="text/css" href="graph_d3.css"/>
-		<script src="d3.min.js"></script>
-		<script src="graph_d3.js"></script>
-		<script src="interactions.js"></script>
+		<link rel="stylesheet" type="text/css" href="scripts/graphViewer/graph_d3.css"/>
+		<link rel="stylesheet" type="text/css" href="scripts/assetViewer/assetOverlay.css"/>
+		<link rel="stylesheet" type="text/css" href="font/font-awesome/css/font-awesome.css"/>
+		
+<!--		<script data-main="scripts/main" src="http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.16/require.js"></script>-->
+		<script data-main="scripts/main" src="require.js"></script>
+		<script src="scripts/graphViewer/graph_d3.js"></script>
+		<script src="scripts/graphViewer/interactions_d3.js"></script>
+		<script src="scripts/assetViewer/assetOverlay.js"></script>
+		<script src="scripts/assetViewer/assetViewerSelector.js"></script>
 		<script type="text/javascript">//<![CDATA[ 
 		
 		document.addEventListener('DOMContentLoaded', function() {
-			svg = damassvggraph.getSVG();
-			
-			var svgD = document.getElementById('graph');
-			svgD.style.height = window.innerHeight + 'px';
-			svgD.style.width = window.innerWidth + 'px';
-			
-			var backD = document.getElementById('backG');
-			backD.setAttribute('height', window.innerHeight + 'px');
-			backD.setAttribute('width', window.innerWidth + 'px');	
+			require(["scripts/graphViewer/d3.min.js"], function(d3){
+				d3.json("scripts/graphViewer/test_mat.json", function(error, json) {
+					svg = damassvggraph.getSVG(json);
+
+					var svgD = document.getElementById('graph');
+					svgD.style.height = window.innerHeight + 'px';
+					svgD.style.width = window.innerWidth + 'px';
+
+					var backD = document.getElementById('backG');
+					backD.setAttribute('height', window.innerHeight + 'px');
+					backD.setAttribute('width', window.innerWidth + 'px');
+					enable_drop(svgD , json);
+				});
+			});
+			window.addEventListener("resize", function() {
+				var svgD = document.getElementById('graph');
+				svgD.style.height = window.innerHeight + 'px';
+				svgD.style.width = window.innerWidth + 'px';
+			});	
 		});
 			
-		window.addEventListener("resize", function() {
-			var svgD = document.getElementById('graph');
-			svgD.style.height = window.innerHeight + 'px';
-			svgD.style.width = window.innerWidth + 'px';
-		});
 			//]]>
 		</script>
 

@@ -1,5 +1,5 @@
 damassvggraph = {
-	getSVG: function() {
+	getSVG: function(json) {
 		
 		var width = window.innerWidth;
 		var height = window.innerHeight;
@@ -19,6 +19,7 @@ damassvggraph = {
 				.attr("viewBox", "0 0 " + width + " " + height )
 				.attr("preserveAspectRatio", "xMidYMid meet")
 				.attr("pointer-events", "all");
+//				.on("mousedown", mousedown);
 
 		defs = svg.append('svg:defs');
 
@@ -45,33 +46,32 @@ damassvggraph = {
 		var g1 = gBox.append('svg:g');
 
 
-		d3.json("bigbuckbunny_characters.json", function(error, data) {
+//		d3.json("bigbuckbunny_characters.json", function(error, data) {
 
 			// make links reference nodes directly for the JSON format:
 			var hash_lookup = [];
 			// make it so we can lookup nodes in O(1):
-			data.nodes.forEach(function(d, i) {
+			json.nodes.forEach(function(d, i) {
 			  hash_lookup[d.id] = d;
 			});
-			data.links.forEach(function(d, i) {
+			json.links.forEach(function(d, i) {
 			  d.source = hash_lookup[d.src_id];
 			  d.target = hash_lookup[d.tgt_id];
 			});
 
-			force
-				.nodes(data.nodes)
-				.links(data.links)
-				.start();
+			var dataNodes = force.nodes(json.nodes);
+			var	dataLinks = force.links(json.links);
+			force.start();
 
-			var link = g2.selectAll(".link")
-				.data(data.links)
-				.enter().append("line")
+			var svgLinks = g2.selectAll(".link")
+				.data(json.links)
+				.enter().append("svg:line")
 				.attr("class", "link")
 				.style("stroke-width", function(d) { return Math.sqrt(d.value); })
 				.style("marker-end",  "url(#arrow)");
 
 			var arrow = defs.selectAll("marker")
-				.data(data.links)
+				.data(json.links)
 				.enter().append("svg:marker")
 				.attr("id", "arrow")
 				.attr("viewBox", "0 -5 10 10")
@@ -80,32 +80,34 @@ damassvggraph = {
 				.attr("markerWidth", 6)
 				.attr("markerHeight", 6)
 				.attr("orient", "auto")
-			.append("path")
+			.append("svg:path")
 				.attr("d", "M0,-5L10,0L0,5 L10,0 L0, -5")
 				.style("stroke", "#4679BD")
 				.style("opacity", "0.6");
 
 
 
-			var node = g1.selectAll(".node")
-				.data(data.nodes)
+			var svgNodes = g1.selectAll(".node")
+				.data(json.nodes)
 				.enter().append("a")
 				.attr('xlink:href', function(d) { return '#'+d.id })
 				.call(force.drag)
+				.on("click", function(d) { assetOverlay(d)});
 
-			var circBG = node.append("circle")
+			var circBG = svgNodes.append("circle")
 					.attr("r", 10)
 					.attr("class", "nodeBG");
 
 
-			var circ = node.append("circle")
+			var circ = svgNodes.append("circle")
 					.attr("r", 10)
 					.attr("fill", function(d) { return "url(#thumb"+d.id+")"; })
 //					.attr("fill", function(d) { return d.keys.image })
 					.attr("class", "node");
+//					.on("click", function(d) { return d.keys.image });
 
 			var patImage = defs.selectAll(".node")
-				.data(data.nodes)
+				.data(json.nodes)
 				.enter().append('svg:pattern')
 				.attr('patternContentUnits', 'objectBoundingBox')
 				.attr('id', function(d) { return "thumb"+d.id; })
@@ -124,11 +126,17 @@ damassvggraph = {
 					.attr('preserveAspectRatio', 'xMidYMid slice');
 			
 
-			node.append("title")
+			svgNodes.append("title")
 				.text(function(d) { return d.type; });
+		
+			svgNodes.append("svg:text")
+				.attr("dx", 12)
+				.attr("dy", ".35em")
+				.text(function(d) { return d.id });
+//				.style("stroke", "white");
 
 			force.on("tick", function() {
-				link.attr("x1", function(d) { return d.source.x; })
+				svgLinks.attr("x1", function(d) { return d.source.x; })
 				.attr("y1", function(d) { return d.source.y; })
 				.attr("x2", function(d) { return d.target.x; })
 				.attr("y2", function(d) { return d.target.y; });
@@ -138,8 +146,34 @@ damassvggraph = {
 
 				circBG.attr("cx", function(d) { return d.x; })
 				.attr("cy", function(d) { return d.y; })
+				
+				d3.selectAll("text").attr("x", function (d) {
+					return d.x;
+				})
+					.attr("y", function (d) {
+					return d.y;
+				});
 			});
+		
+//			circ.addEventListener( 'click', function(e){
+//				if(window['assetOverlay']){
+//					assetOverlay(this.json);
+//				}
+//			});
+		
+		
+		
+//			svgNodes.on('click', function(e){
+//				if(window['assetOverlay']){
+//					var node = d3.select(this)
+//						.data(function(d) { return d.type; });
+////						.data(json);
+//					alert(node);
+////					assetOverlay(node);
+//				}
+//			});
 
+		
 //				circ.on('click', function(d){
 //					d3.select(this)
 //						.classed('selected',true)
@@ -158,7 +192,8 @@ damassvggraph = {
 //						.remove();
 //			});
 
-		});
+//		});
+			
 	},
 	makeSVGinteractive: function() {
 		// TEST FOR DROP

@@ -2,22 +2,6 @@ body {
 	margin: 0;
 }
 
-div#graphDebug {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	pointer-events:none;
-}
-
-
-.static {
-	width: 100%;
-	height: 50px;
-	
-}
-
 #grid {
 	width: 10px;
 	height: 10px;
@@ -67,6 +51,12 @@ div#graphDebug {
 	stroke-opacity: .6;
 }
 
+text {
+	font: 6px arial;
+	fill:white;
+/*	stroke:white;*/
+}
+
 circle {
 	transition: opacity 100ms ease;
 /*
@@ -111,6 +101,7 @@ line.red marker {
 */
 line:hover {
 	stroke: #a3330a;
+	cursor: pointer;
 }
 
 circle:hover {
