@@ -46,7 +46,7 @@ damassvggraph = {
 		var g1 = gBox.append('svg:g');
 
 
-//		d3.json("bigbuckbunny_characters.json", function(error, data) {
+		d3.json("test_mat.json", function(error, json) {
 
 			// make links reference nodes directly for the JSON format:
 			var hash_lookup = [];
@@ -192,7 +192,7 @@ damassvggraph = {
 //						.remove();
 //			});
 
-//		});
+		});
 			
 	},
 	makeSVGinteractive: function() {
