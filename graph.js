@@ -1,3 +1,15 @@
+(function (root, factory) {
+	if (typeof define === 'function' && define.amd) {
+		// AMD. Register as an anonymous module.
+		define(['springy', 'svg-pan-zoom'], factory);
+	} else {
+		// Browser globals
+		root.damasGraph = factory(root.Springy, root.svgPanZoom);
+	}
+}(this, function (Springy, svgPanZoom) {
+
+//define( ['springy', 'svg-pan-zoom' ], function( Springy, svgPanZoom ){
+
 springy_damas = {
 	ray: 12,
 	edge_distance: 12,
@@ -12,6 +24,39 @@ GRAPH =  function(){
 
 }
 */
+
+var damasGraph = {};
+damasGraph.node_indexes = [];
+damasGraph.node_lut = {};
+
+damasGraph.init = function ( htmlelem )
+{
+	//window.Springy = Springy;
+	this.springy_graph = new Springy.Graph();
+	this.springy_layout = new Springy.Layout.ForceDirected(this.springy_graph, 300.0, 300.0, 0.5);
+	this.svg = damassvggraph.getSVG();
+	htmlelem.appendChild(this.svg);
+
+	this.svgpanzoominstance = svgPanZoom('#svggraph' );
+	springy_damas.currentBB = this.springy_layout.getBoundingBox();
+	this.springy_renderer = springy_damas.get_renderer( this.springy_layout );
+	this.springy_renderer.start();
+}
+
+damasGraph.newNode = function( node ){
+	this.node_indexes.push(node.id);
+	var springy_node = this.springy_graph.newNode(node);
+	this.node_lut[node.id] = springy_node.id;
+	//this.node_lut[springy_node.id] = node.id;
+}
+
+damasGraph.newEdge = function( source, target ){
+	springy_source_id = this.node_lut[source];
+	springy_target_id = this.node_lut[target];
+	springy_source_node = this.springy_graph.nodes[springy_source_id];
+	springy_target_node = this.springy_graph.nodes[springy_target_id];
+	this.springy_graph.newEdge(springy_source_node, springy_target_node);
+}
 
 damassvggraph = {
 	getSVG: function() {
@@ -257,6 +302,14 @@ springy_damas.get_renderer = function( layout )
 				//a.setAttribute('title', escape(JSON.stringify(node.data)));
 				var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
 				//var txt = JSON.stringify(node.data);
+
+				var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+				var textNode = document.createTextNode("qweqwe");
+				text.setAttribute("x",0);
+				text.setAttribute("y",0);
+				text.appendChild(textNode);
+				circle.appendChild(text);
+
 				if( node.data.keys.file )
 				{
 					var title = document.createElementNS("http://www.w3.org/2000/svg", 'title');
@@ -309,6 +362,10 @@ springy_damas.get_renderer = function( layout )
 				if(node.data.keys.type)
 				{
 					circle.setAttribute('class', node.data.keys.type);
+				}
+				if(node.data.targets > 0)
+				{
+					
 				}
 				damassvggraph.g2.appendChild(a);
 
@@ -401,3 +458,9 @@ springy_damas.fromScreen = function(s) {
 	var py = (s.y / springy_damas.viewport.getBBox().height) * size.y + springy_damas.currentBB.bottomleft.y;
 	return new Springy.Vector(px, py);
 };
+
+
+
+return damasGraph;
+
+}));
