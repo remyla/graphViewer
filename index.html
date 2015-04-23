@@ -5,12 +5,24 @@
 		<link rel="stylesheet" type="text/css" href="graph.css"/>
 		<script src="d3.min.js"></script>
 		<script src="springy.js"></script>
-		<script src="graph.js"></script>
 		<script src="svg-pan-zoom.js"></script>
+		<script src="graph.js"></script>
 		<script src="interactions.js"></script>
 		<script type="text/javascript">//<![CDATA[ 
 			document.addEventListener('DOMContentLoaded', function() {
 				fetchJSONFile('example.json', function(data){
+					damasGraph.init( document.getElementById('graph'));
+					for(i=0;i<data['nodes'].length;i++)
+					{
+						var n = data['nodes'][i];
+						damasGraph.newNode(n);
+					}
+					for(i=0;i<data['links'].length;i++)
+					{
+						var l = data['links'][i];
+						damasGraph.newEdge( l['tgt_id'], l['src_id'] );
+					}
+/*
 					svg = damassvggraph.getSVG();
 					document.getElementById('graph').appendChild( svg );
 					//window.svgpanzoominstance = svgPanZoom('#svggraph', { fit: false, zoom: 2 } );
@@ -34,12 +46,13 @@
 					springy_damas.svg = svg;
 					var springy_renderer = springy_damas.get_renderer( springy_layout );
 					springy_renderer.start();
-					svg.style.height = window.innerHeight -4 + 'px';
+*/
+					damasGraph.svg.style.height = window.innerHeight -4 + 'px';
 					enable_drop(svg, springy_graph);
 				});
 			});
 			window.addEventListener("resize", function() {
-				svg.style.height = window.innerHeight -4 + 'px';
+				damasGraph.svg.style.height = window.innerHeight -4 + 'px';
 			});
                 //]]>
         </script>
