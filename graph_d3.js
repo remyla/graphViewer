@@ -145,7 +145,8 @@ damassvggraph = {
 			svgNodes.append("svg:text")
 				.attr("dx", 12)
 				.attr("dy", ".35em")
-				.text(function(d) { return d.id });
+				.text(function(d) { return d.keys.file.split('/').pop() });
+//				.text(function(d) { return d.id });
 //				.style("stroke", "white");
 
 			force.on("tick", function() {
