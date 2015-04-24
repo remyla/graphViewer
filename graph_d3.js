@@ -80,7 +80,7 @@ damassvggraph = {
 				.attr("markerWidth", 6)
 				.attr("markerHeight", 6)
 				.attr("orient", "auto")
-			.append("svg:path")
+				.append("svg:path")
 				.attr("d", "M0,-5L10,0L0,5 L10,0 L0, -5")
 				.style("stroke", "#4679BD")
 				.style("opacity", "0.6");
@@ -91,13 +91,11 @@ damassvggraph = {
 				.data(json.nodes)
 				.enter().append("a")
 				.attr('xlink:href', function(d) { return '#'+d.id })
-				.call(force.drag)
-				.on("click", function(d) { assetOverlay(d)});
+				.call(force.drag);
 
 			var circBG = svgNodes.append("circle")
 					.attr("r", 10)
 					.attr("class", "nodeBG");
-
 
 			var circ = svgNodes.append("circle")
 					.attr("r", 10)
@@ -106,6 +104,11 @@ damassvggraph = {
 					.attr("class", "node");
 //					.on("click", function(d) { return d.keys.image });
 
+			circ.on("click", function(d) {
+				if (d3.event.defaultPrevented) return; // click suppressed
+				assetOverlay(d);
+			});
+			
 			var patImage = defs.selectAll(".node")
 				.data(json.nodes)
 				.enter().append('svg:pattern')
@@ -116,15 +119,25 @@ damassvggraph = {
 				.attr('width', 1)
 				.attr('height', 1);
 
-				patImage.append('image')
-					.attr('xlink:href', function(d) { return d.keys.image })
-					.attr('x', '0')
-					.attr('x', '0')
-					.attr('y', '0')
-					.attr('width', 1)
-					.attr('height', 1)
-					.attr('preserveAspectRatio', 'xMidYMid slice');
+			patImage.append('image')
+				.attr('xlink:href', function(d) { return d.keys.image })
+				.attr('x', '0')
+				.attr('y', '0')
+				.attr('width', 1)
+				.attr('height', 1)
+				.attr('preserveAspectRatio', 'xMidYMid slice');
 			
+			var open = svgNodes.append("circle")
+				.attr('r', 3)
+				.style("stroke", "white")
+				.style("stroke-width", 0.5)
+				.attr('fill', 'white');
+			
+			var openPlus = svgNodes.append("svg:image")
+				.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
+				.attr('width', 4)
+				.attr('height', 4)
+				.on('click', function (d) { alert( d.id)});
 
 			svgNodes.append("title")
 				.text(function(d) { return d.type; });
@@ -132,7 +145,8 @@ damassvggraph = {
 			svgNodes.append("svg:text")
 				.attr("dx", 12)
 				.attr("dy", ".35em")
-				.text(function(d) { return d.id });
+				.text(function(d) { return d.keys.file.split('/').pop() });
+//				.text(function(d) { return d.id });
 //				.style("stroke", "white");
 
 			force.on("tick", function() {
@@ -142,10 +156,16 @@ damassvggraph = {
 				.attr("y2", function(d) { return d.target.y; });
 
 				circ.attr("cx", function(d) { return d.x; })
-				.attr("cy", function(d) { return d.y; })
+				.attr("cy", function(d) { return d.y; });
 
 				circBG.attr("cx", function(d) { return d.x; })
-				.attr("cy", function(d) { return d.y; })
+				.attr("cy", function(d) { return d.y; });
+				
+				open.attr("cx", function(d) { return (d.x) + 7; })
+				.attr("cy", function(d) { return (d.y) + 7; })
+				
+				openPlus.attr("x", function(d) { return (d.x) + 5; })
+				.attr("y", function(d) { return (d.y) + 5; });
 				
 				d3.selectAll("text").attr("x", function (d) {
 					return d.x;
