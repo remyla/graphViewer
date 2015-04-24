@@ -1,12 +1,12 @@
 (function (root, factory) {
 	if (typeof define === 'function' && define.amd) {
 		// AMD. Register as an anonymous module.
-		define(['springy', 'svg-pan-zoom'], factory);
+		define(['graph-common', 'springy', 'svg-pan-zoom'], factory);
 	} else {
 		// Browser globals
-		root.damasGraph = factory(root.Springy, root.svgPanZoom);
+		root.damasGraph = factory(root.damasGraph, root.Springy, root.svgPanZoom);
 	}
-}(this, function (Springy, svgPanZoom) {
+}(this, function (damasGraph, Springy, svgPanZoom) {
 
 //define( ['springy', 'svg-pan-zoom' ], function( Springy, svgPanZoom ){
 
@@ -25,17 +25,16 @@ GRAPH =  function(){
 }
 */
 
-	var damasGraph = {
-		node_indexes: [],
-		node_lut: {},
-	};
+	damasGraph.node_indexes = [];
+	damasGraph.node_lut = {};
 
 	damasGraph.init = function ( htmlelem )
 	{
 		//window.Springy = Springy;
 		this.springy_graph = new Springy.Graph();
 		this.springy_layout = new Springy.Layout.ForceDirected(this.springy_graph, 300.0, 300.0, 0.5);
-		this.svg = damassvggraph.getSVG();
+		//this.svg = damassvggraph.getSVG();
+		this.svg = this.init_SVG();
 		htmlelem.appendChild(this.svg);
 
 		this.svgpanzoominstance = svgPanZoom('#svggraph', { minZoom: 0.1, maxZoom: 10 } );
@@ -62,80 +61,6 @@ GRAPH =  function(){
 	}
 
 damassvggraph = {
-	getSVG: function() {
-		var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-		svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
-		svg.setAttribute('id', 'svggraph' );
-		svg.setAttribute('viewBox', '0 0 200 200' );
-		//var css = document.createElementNS("http://www.w3.org/2000/svg", "style");
-		//svg.appendChild(css);
-		//css.setAttribute('type', 'text/css' );
-		//css.setAttribute('href', 'graph.css' );
-		var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-		// marker 1
-		var marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
-		marker.setAttribute('id', 'arrow' );
-		marker.setAttribute('markerWidth', '3' );
-		marker.setAttribute('markerHeight', '3' );
-		marker.setAttribute('refX', '1.5' );
-		marker.setAttribute('refY', '1.5' );
-		marker.setAttribute('orient', 'auto' );
-		marker.setAttribute('markerUnits', 'strokeWidth' );
-		var triangle = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		triangle.setAttribute('d', 'M0,0 L0,3 L3,1.5 Z' );
-		marker.appendChild(triangle);
-		defs.appendChild(marker);
-		
-		// X & Y axes
-		var axisX = document.createElementNS("http://www.w3.org/2000/svg", "line");
-		axisX.setAttribute('x1', '0' );
-		axisX.setAttribute('y1', '0' );
-		axisX.setAttribute('x2', '10' );
-		axisX.setAttribute('y2', '0' );
-		axisX.setAttribute('class', 'axis' );
-		svg.appendChild(axisX);
-		
-		
-		var axisY = document.createElementNS("http://www.w3.org/2000/svg", "line");
-		axisY.setAttribute('x1', '0' );
-		axisY.setAttribute('y1', '0' );
-		axisY.setAttribute('x2', '0' );
-		axisY.setAttribute('y2', '10' );
-		axisY.setAttribute('class', 'axis' );
-		svg.appendChild(axisY);
-		
-//		var center = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-//		center.setAttribute('cx', '00' );
-//		center.setAttribute('cy', '0' );
-//		center.setAttribute('r', '1' );
-//		center.setAttribute('fill', 'red' );
-//		svg.appendChild(center);
-
-
-		// marker timealert
-		var marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
-		marker.setAttribute('id', 'arrowTimealert' );
-		marker.setAttribute('markerWidth', '3' );
-		marker.setAttribute('markerHeight', '3' );
-		marker.setAttribute('refX', '1.5' );
-		marker.setAttribute('refY', '1.5' );
-		marker.setAttribute('orient', 'auto' );
-		marker.setAttribute('markerUnits', 'strokeWidth' );
-		var triangle = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		triangle.setAttribute('d', 'M0,0 L0,3 L3,1.5 Z' );
-		marker.appendChild(triangle);
-		defs.appendChild(marker);
-
-		var g2 = document.createElementNS("http://www.w3.org/2000/svg", "g");
-		var g1 = document.createElementNS("http://www.w3.org/2000/svg", "g");
-		svg.appendChild(defs);
-		svg.appendChild(g2);
-		svg.appendChild(g1);
-		this.defs = defs;
-		this.g2 = g2;
-		this.g1 = g1;
-		return svg;
-	},
 	makeSVGinteractive: function() {
 		// TEST FOR DROP
 		/*
@@ -336,7 +261,7 @@ springy_damas.get_renderer = function( layout )
 				if(node.data.keys.image)
 				{
 					pattern = document.createElementNS("http://www.w3.org/2000/svg", 'pattern');
-					damassvggraph.defs.appendChild( pattern );
+					damasGraph.defs.appendChild( pattern );
 					pattern.setAttribute('id', 'thumb'+node.data.id);
 					pattern.setAttribute('patternContentUnits', 'objectBoundingBox');
 					pattern.setAttribute('x', '0');
@@ -378,7 +303,7 @@ springy_damas.get_renderer = function( layout )
 				node.plus.setAttribute('width', 5);
 				node.plus.setAttribute('height', 5);
 				
-				damassvggraph.g2.appendChild(a);
+				damasGraph.g2.appendChild(a);
 
 /*
 				a.addEventListener("click", function( e ){

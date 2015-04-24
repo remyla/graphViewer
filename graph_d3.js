@@ -1,15 +1,34 @@
-damassvggraph = {
-	getSVG: function(json) {
-		
+(function (root, factory) {
+        if (typeof define === 'function' && define.amd) {
+                // AMD. Register as an anonymous module.
+                define(['graph-common', 'd3'], factory);
+        } else {
+                // Browser globals
+                root.damasGraph = factory(root.damasGraph, root.d3);
+        }
+}(this, function (damasGraph, d3) {
+
+
+	damasGraph.init = function ( htmlelem )
+	{
+		this.svg = this.init_SVG2();
+		//svg = this.svg;
+
 		var width = window.innerWidth;
 		var height = window.innerHeight;
 
-		var color = d3.scale.category20();
-
-		var force = d3.layout.force()
+		this.force = d3.layout.force()
 			.charge(-200)
 			.linkDistance(30)
 			.size([width, height]);
+	}
+
+	damasGraph.init_SVG2 = function ( htmlelem )
+	{
+		var color = d3.scale.category20();
+
+		var width = window.innerWidth;
+		var height = window.innerHeight;
 
 		svg = d3.select("#graph")
 			.append("svg:svg")
@@ -42,11 +61,15 @@ damassvggraph = {
 			+ " scale(" + scale + ")");
 		}
 
-		var g2 = gBox.append('svg:g');
-		var g1 = gBox.append('svg:g');
+		this.g2 = gBox.append('svg:g');
+		this.g1 = gBox.append('svg:g');
 
+			
+	}
 
-		d3.json("test_mat.json", function(error, json) {
+	damasGraph.load = function ( path )
+	{
+		d3.json( path, function(error, json) {
 
 			// make links reference nodes directly for the JSON format:
 			var hash_lookup = [];
@@ -59,11 +82,11 @@ damassvggraph = {
 			  d.target = hash_lookup[d.tgt_id];
 			});
 
-			var dataNodes = force.nodes(json.nodes);
-			var	dataLinks = force.links(json.links);
-			force.start();
+			var dataNodes = damasGraph.force.nodes(json.nodes);
+			var	dataLinks = damasGraph.force.links(json.links);
+			damasGraph.force.start();
 
-			var svgLinks = g2.selectAll(".link")
+			var svgLinks = damasGraph.g2.selectAll(".link")
 				.data(json.links)
 				.enter().append("svg:line")
 				.attr("class", "link")
@@ -87,11 +110,11 @@ damassvggraph = {
 
 
 
-			var svgNodes = g1.selectAll(".node")
+			var svgNodes = damasGraph.g1.selectAll(".node")
 				.data(json.nodes)
 				.enter().append("a")
 				.attr('xlink:href', function(d) { return '#'+d.id })
-				.call(force.drag);
+				.call(damasGraph.force.drag);
 
 			var circBG = svgNodes.append("circle")
 					.attr("r", 10)
@@ -149,7 +172,7 @@ damassvggraph = {
 //				.text(function(d) { return d.id });
 //				.style("stroke", "white");
 
-			force.on("tick", function() {
+			damasGraph.force.on("tick", function() {
 				svgLinks.attr("x1", function(d) { return d.source.x; })
 				.attr("y1", function(d) { return d.source.y; })
 				.attr("x2", function(d) { return d.target.x; })
@@ -213,100 +236,7 @@ damassvggraph = {
 //			});
 
 		});
-			
-	},
-	makeSVGinteractive: function() {
-		// TEST FOR DROP
-		/*
-		allowDrop = function(ev){
-			ev.preventDefault();
-			return false;
-		}
-		drop = function(ev){
-			alert('drop');
-			ev.preventDefault();
-			//console.log(ev.dataTransfer);
-			//console.log(ev.dataTransfer.files[0]);
-			console.log(ev.dataTransfer.files);
-			var files = ev.dataTransfer.files;
-			//alert(files.length);
-			for(i=0;i<files.length;i++)
-			{
-				var file = files[i];
-				var elem = damas.create(file);
-				elem.update({label: file.name });
-				nodes[elem.id] = graph.newNode({'label': file.name});
-				nodes[elem.id].damelem = elem;
-				//console.log(ev.dataTransfer);
-			}
-		}
-		svg.setAttribute('ondragover', 'allowDrop(event)');
-		svg.setAttribute('ondrop', 'drop(event)');
-		*/
-
-		function cancel(e){
-			e.stopPropagation();
-			if(e.preventDefault) e.preventDefault();
-			e.dataTransfer.dropEffect = 'copy';
-			return false; // required by IE
-		}
-		svg.ondragover = cancel;
-		svg.ondragenter = cancel;
-/*
-		svg.ondragover = function(e){
-			e.stopPropagation();
-			e.preventDefault();
-		}
-*/
-		svg.ondragleave = function(e){
-			e.stopPropagation();
-			e.preventDefault();
-		}
-		svg.ondrop = function(e){
-			//alert( e.dataTransfer.getData('Text'));
-			e.stopPropagation();
-			if(e.preventDefault) e.preventDefault();
-			//alert('ondrop');
-			console.log(e.dataTransfer);
-			console.log(e.dataTransfer.files);
-			var files = e.dataTransfer.files;
-
-			// DROP FILES
-			for(i=0;i<files.length;i++)
-			{
-				var file = files[i];
-				var elem = damas.create(file);
-				elem.update({label: file.name });
-				nodes[elem.id] = graph.newNode({'label': file.name});
-				nodes[elem.id].damelem = elem;
-				//console.log(ev.dataTransfer);
-			}
-			console.log(e.dataTransfer.types);
-			var types = e.dataTransfer.types;
-			if(e.dataTransfer.types)
-			{
-				// DROP EXISTING NODE
-				var text = e.dataTransfer.getData('Text');
-				if( text.indexOf(window.location.origin) === 0)
-				{
-					id = text.replace(window.location.origin+window.location.pathname+'#view=', '');
-					var elem = damas.read(parseInt(id));
-                                	Object.extend( elem, damas.element_canvas );
-                                	var img = elem.imageURL();
-                                	nodes[elem.id] = graph.newNode( { 'elem':elem, 'label': elem.label(), 'damid': elem.id, 'damimg': img } );
-                                	nodes[elem.id].damelem = elem;
-				}
-				// DROP LINK
-				else
-				{
-					var elem = damas.create( {
-						url: e.dataTransfer.getData('Text')
-					});
-					nodes[elem.id] = graph.newNode({'label': e.dataTransfer.getData('Text')});
-					nodes[elem.id].damelem = elem;
-				}
-			}
-		}
-		// TEST END
 	}
-}
+
+	return damasGraph;
+}));
