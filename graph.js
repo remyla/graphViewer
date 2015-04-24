@@ -25,38 +25,41 @@ GRAPH =  function(){
 }
 */
 
-var damasGraph = {};
-damasGraph.node_indexes = [];
-damasGraph.node_lut = {};
+	var damasGraph = {
+		node_indexes: [],
+		node_lut: {},
+	};
 
-damasGraph.init = function ( htmlelem )
-{
-	//window.Springy = Springy;
-	this.springy_graph = new Springy.Graph();
-	this.springy_layout = new Springy.Layout.ForceDirected(this.springy_graph, 300.0, 300.0, 0.5);
-	this.svg = damassvggraph.getSVG();
-	htmlelem.appendChild(this.svg);
+	damasGraph.init = function ( htmlelem )
+	{
+		//window.Springy = Springy;
+		this.springy_graph = new Springy.Graph();
+		this.springy_layout = new Springy.Layout.ForceDirected(this.springy_graph, 300.0, 300.0, 0.5);
+		this.svg = damassvggraph.getSVG();
+		htmlelem.appendChild(this.svg);
 
-	this.svgpanzoominstance = svgPanZoom('#svggraph' );
-	springy_damas.currentBB = this.springy_layout.getBoundingBox();
-	this.springy_renderer = springy_damas.get_renderer( this.springy_layout );
-	this.springy_renderer.start();
-}
+		this.svgpanzoominstance = svgPanZoom('#svggraph', { minZoom: 0.1, maxZoom: 10 } );
+		springy_damas.currentBB = this.springy_layout.getBoundingBox();
+		this.springy_renderer = springy_damas.get_renderer( this.springy_layout );
+		this.springy_renderer.start();
+	}
 
-damasGraph.newNode = function( node ){
-	this.node_indexes.push(node.id);
-	var springy_node = this.springy_graph.newNode(node);
-	this.node_lut[node.id] = springy_node.id;
-	//this.node_lut[springy_node.id] = node.id;
-}
+	damasGraph.newNode = function( node ){
+		if (this.node_lut[node.id]) return false;
+		this.node_indexes.push(node.id);
+		var springy_node = this.springy_graph.newNode(node);
+		this.node_lut[node.id] = springy_node.id;
+		//this.node_lut[springy_node.id] = node.id;
+		return true;
+	}
 
-damasGraph.newEdge = function( source, target ){
-	springy_source_id = this.node_lut[source];
-	springy_target_id = this.node_lut[target];
-	springy_source_node = this.springy_graph.nodes[springy_source_id];
-	springy_target_node = this.springy_graph.nodes[springy_target_id];
-	this.springy_graph.newEdge(springy_source_node, springy_target_node);
-}
+	damasGraph.newEdge = function( source, target ){
+		springy_source_id = this.node_lut[source];
+		springy_target_id = this.node_lut[target];
+		springy_source_node = this.springy_graph.nodes[springy_source_id];
+		springy_target_node = this.springy_graph.nodes[springy_target_id];
+		this.springy_graph.newEdge(springy_source_node, springy_target_node);
+	}
 
 damassvggraph = {
 	getSVG: function() {
@@ -426,6 +429,12 @@ springy_damas.get_renderer = function( layout )
 				});
 */
 				circle.addEventListener( 'click', function(e){
+					if(e.ctrlKey)
+					{
+						damas_open(this.data.id);
+						e.preventDefault();
+						return false;
+					}
 					if(window['assetOverlay']){
 						assetOverlay(this.data);
 					}
