@@ -307,9 +307,7 @@ springy_damas.get_renderer = function( layout )
 				//var txt = JSON.stringify(node.data);
 
 				node.text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-				var textNode = document.createTextNode( node.data.keys.file.split('/').reverse()[0]);
 				node.text.setAttribute('style', 'font: 4px arial');
-				node.text.appendChild(textNode);
 				a.appendChild(node.text);
 
 				if( node.data.keys.file )
@@ -318,6 +316,10 @@ springy_damas.get_renderer = function( layout )
 					var titleText = document.createTextNode( node.data.keys.file.split('/').reverse()[0]);
 					title.appendChild(titleText);
 					circle.appendChild(title);
+
+					var textNode = document.createTextNode( node.data.keys.file.split('/').reverse()[0]);
+					node.text.appendChild(textNode);
+
 				}
 				if( node.data.keys.name )
 				{
