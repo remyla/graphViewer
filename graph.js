@@ -168,7 +168,7 @@ springy_damas.get_renderer = function( layout )
 			if( !edge.shape )
 			{
 				edge.shape = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-				damassvggraph.g1.appendChild( edge.shape );
+				damasGraph.g1.appendChild( edge.shape );
 				if( edge.source.data.keys.time > edge.target.data.keys.time )
 				{
 					edge.shape.setAttribute('marker-end', 'url(#arrowTimealert)' );
