@@ -32,7 +32,7 @@ function enable_drop( svg, graph ) {
 		e.preventDefault();
 	}
 	svg.ondrop = function(e){
-		alert('COMING SOON :) Drop your assets and connect them, in this web page');
+		//alert('COMING SOON :) Drop your assets and connect them, in this web page');
 		//alert( e.dataTransfer.getData('Text'));
 		e.stopPropagation();
 		if(e.preventDefault) e.preventDefault();
