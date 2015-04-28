@@ -228,6 +228,7 @@
 			damasGraph.nodes = damasGraph.force.nodes();
 			//damasGraph.force
 			var dataLinks = damasGraph.force.links(json.links);
+			damasGraph.links = damasGraph.force.links();
 
 			//damasGraph.force.start();
 
