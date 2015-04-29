@@ -86,7 +86,16 @@
 
 	damasGraph.newEdge = function ( link )
 	{
-		this.links.push( { source: this.node_lut[link.src_id], target: this.node_lut[link.tgt_id] } );
+		for( l in this.force.links )
+		{
+			if (l.id === link.link_id) return false;
+		}
+		//if (this.force.links[node.id]) return false;
+		this.links.push({
+			id: link.link_id,
+			source: this.node_lut[link.src_id],
+			target: this.node_lut[link.tgt_id]
+		});
 		this.restart();
 		return true;
 	}
