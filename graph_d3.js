@@ -135,20 +135,60 @@
 			.attr('width', 1)
 			.attr('height', 1)
 			.attr('preserveAspectRatio', 'xMidYMid slice');
+		
 
-/*
-		var open = damasGraph.svgNodes.append("circle")
+		
+		var tools = g.append('svg:g')
+			.attr("class", "tools")
+			.style('opacity', '0');
+		
+		var toolsBGCircle = tools.append("circle")
+			.attr('r', 17)
+			.attr('cx', '0')
+			.attr('cy', '0')
+			.style('opacity', '0');
+		
+		var openCircle = tools.append("circle")
 			.attr('r', 3)
+			.attr('cx', '-10')
+			.attr('cy', '10')
 			.style("stroke", "white")
 			.style("stroke-width", 0.5)
 			.attr('fill', 'white');
 
-		var openPlus = damasGraph.svgNodes.append("svg:image")
+		var shareCircle = tools.append("circle")
+			.attr('r', 3)
+			.attr('cx', '-14')
+			.attr('cy', '0')
+			.style("stroke", "white")
+			.style("stroke-width", 0.5)
+			.attr('fill', 'white');
+
+		var deleteCircle = tools.append("circle")
+			.attr('r', 3)
+			.attr('cx', '-10')
+			.attr('cy', '-10')
+			.style("stroke", "white")
+			.style("stroke-width", 0.5)
+			.attr('fill', 'white');
+
+		var openPlus = tools.append("svg:image")
 			.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
+			.attr("class", "openPlus")
+			.attr('x', '-12')
+			.attr('y', '8')
 			.attr('width', 4)
 			.attr('height', 4)
 			.on('click', function (d) { alert( d.id)});
-*/
+
+		g.on("mouseover", function(d) {
+			var nodeSelection = d3.select(this);
+			nodeSelection.select('g').style({opacity:'1.0'});
+		});
+		g.on("mouseout", function(d) {
+			var nodeSelection = d3.select(this);
+			nodeSelection.select('g').style({opacity:'0.0'});
+		});
 
 		//damasGraph.svgNodes.append("title")
 			//.text(function(d) { return d.type; });
@@ -159,10 +199,10 @@
 		this.svgLinks = this.svgLinks.data(this.links)
 			.enter().append("svg:line")
 			.attr("class", "link")
-			.style("stroke-width", function(d) { return Math.sqrt(d.value); })
+//			.style("stroke-width", function(d) { return Math.sqrt(d.value); })
 			.style("marker-end",  "url(#arrow)");
 
-/*
+
 		var arrow = this.defs.selectAll("marker")
 			.data(this.links)
 			.enter().append("svg:marker")
@@ -177,14 +217,14 @@
 			.attr("d", "M0,-5L10,0L0,5 L10,0 L0, -5")
 			.style("stroke", "#4679BD")
 			.style("opacity", "0.6");
-*/
+
 
 		this.force.start();
 	}
 	damasGraph.tick = function ( )
 	{
-		damasGraph.svgLinks.attr("x1", function(d) { return d.source.x; })
-			.attr("y1", function(d) { return d.source.y; })
+		damasGraph.svgLinks.attr("x1", function(d) { return (d.source.x); })
+			.attr("y1", function(d) { return (d.source.y); })
 			.attr("x2", function(d) { return d.target.x; })
 			.attr("y2", function(d) { return d.target.y; });
 
