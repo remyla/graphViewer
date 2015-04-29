@@ -52,6 +52,46 @@ GRAPH =  function(){
 		return true;
 	}
 
+	damasGraph.newEdge = function( l ){
+		var springy_source_id = this.node_lut[l['src_id']];
+		var springy_target_id = this.node_lut[l['tgt_id']];
+		var springy_source_node = this.springy_graph.nodes[springy_source_id];
+		var springy_target_node = this.springy_graph.nodes[springy_target_id];
+		this.springy_graph.newEdge(springy_source_node, springy_target_node);
+	}
+
+	/**
+	 * Clear the graph
+	 */
+	damasGraph.erase = function( ){
+		this.springy_graph.filterNodes( function(){return false} );
+		while(this.g1.firstChild)
+			this.g1.removeChild(this.g1.firstChild);
+		while(this.g2.firstChild)
+			this.g2.removeChild(this.g2.firstChild);
+		this.node_lut = {};
+		this.node_indexes.length = 0;
+		this.springy_graph.nextNodeId = 0;
+		this.springy_graph.nextLinkId = 0;
+		return true;
+	}
+
+	damasGraph.load = function( json ){
+		var i;
+		for(i=0;i<json['nodes'].length;i++)
+		{
+			var n = json['nodes'][i];
+			damasGraph.newNode(n);
+		}
+		for(i=0;i<json['links'].length;i++)
+		{
+			var l = json['links'][i];
+			damasGraph.newEdge( l );
+		}
+		return true;
+	}
+
+/*
 	damasGraph.newEdge = function( source, target ){
 		springy_source_id = this.node_lut[source];
 		springy_target_id = this.node_lut[target];
@@ -59,6 +99,7 @@ GRAPH =  function(){
 		springy_target_node = this.springy_graph.nodes[springy_target_id];
 		this.springy_graph.newEdge(springy_source_node, springy_target_node);
 	}
+*/
 
 damassvggraph = {
 	makeSVGinteractive: function() {
