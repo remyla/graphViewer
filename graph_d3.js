@@ -205,12 +205,13 @@
 		g.call(this.force.drag);
 
 		// add new links
+		console.log(this.links);
 		this.svgLinks = this.svgLinks.data(this.links)
 			.enter().append("svg:line")
 			.attr("class", "link")
-//			.style("stroke-width", function(d) { return Math.sqrt(d.value); })
-			.style("marker-end",  "url(#arrow)");
-
+			//.style("stroke-width", function(d) { return Math.sqrt(d.value); })
+			.style("stroke-width", '1');
+			//.style("marker-end",  "url(#arrow)");
 
 		var arrow = this.defs.selectAll("marker")
 			.data(this.links)
@@ -258,7 +259,7 @@
 */
 	}
 
-	damasGraph.load = function ( path )
+	damasGraph.load2 = function ( path )
 	{
 		d3.json( path, function(error, json) {
 
