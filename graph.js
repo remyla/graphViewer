@@ -210,7 +210,8 @@ springy_damas.get_renderer = function( layout )
 			{
 				edge.shape = document.createElementNS("http://www.w3.org/2000/svg", 'line');
 				damasGraph.g1.appendChild( edge.shape );
-				if( edge.source.data.keys.time > edge.target.data.keys.time )
+				if( edge.source.data.time > edge.target.data.time )
+				//if( edge.source.data.keys.time > edge.target.data.keys.time )
 				{
 					edge.shape.setAttribute('marker-end', 'url(#arrowTimealert)' );
 					edge.shape.setAttribute('class', 'timealert' );
@@ -266,7 +267,7 @@ springy_damas.get_renderer = function( layout )
 			if( !node.shape )
 			{
 				a = document.createElementNS("http://www.w3.org/2000/svg", 'a');
-				a.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#' + node.data.id );
+				a.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#' + node.data._id );
 				//a.setAttributeNS('http://www.w3.org/1999/xlink', 'href', node.data.keys.file );
 				//a.setAttribute('title', escape(JSON.stringify(node.data)));
 				var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
@@ -276,21 +277,24 @@ springy_damas.get_renderer = function( layout )
 				node.text.setAttribute('style', 'font: 4px arial');
 				a.appendChild(node.text);
 
-				if( node.data.keys.file )
+				var file = (node.data.keys)? node.data.keys.file : node.data.file;
+
+				if (file)
 				{
 					var title = document.createElementNS("http://www.w3.org/2000/svg", 'title');
-					var titleText = document.createTextNode( node.data.keys.file.split('/').reverse()[0]);
+					var titleText = document.createTextNode( file.split('/').reverse()[0]);
 					title.appendChild(titleText);
 					circle.appendChild(title);
 
-					var textNode = document.createTextNode( node.data.keys.file.split('/').reverse()[0]);
+					var textNode = document.createTextNode( file.split('/').reverse()[0]);
 					node.text.appendChild(textNode);
 
 				}
-				if( node.data.keys.name )
+				var name = (node.data.keys)? node.data.keys.name : node.data.name;
+				if (name)
 				{
 					var title = document.createElementNS("http://www.w3.org/2000/svg", 'title');
-					var titleText = document.createTextNode(node.data.keys.name);
+					var titleText = document.createTextNode(name);
 					title.appendChild(titleText);
 					circle.appendChild(title);
 				}
@@ -299,10 +303,11 @@ springy_damas.get_renderer = function( layout )
 				circle.point = p;
 				a.appendChild(circle);
 				circle.setAttribute('r',springy_damas.ray);
-				if(node.data.keys.image)
+				var image = (node.data.keys)? node.data.keys.image : node.data.image;
+				if (image)
 				{
 					pattern = document.createElementNS("http://www.w3.org/2000/svg", 'pattern');
-					damasGraph.defs.appendChild( pattern );
+					damasGraph.defs.appendChild(pattern);
 					pattern.setAttribute('id', 'thumb'+node.data.id);
 					pattern.setAttribute('patternContentUnits', 'objectBoundingBox');
 					pattern.setAttribute('x', '0');
@@ -310,14 +315,14 @@ springy_damas.get_renderer = function( layout )
 					pattern.setAttribute('width', 1);
 					pattern.setAttribute('height', 1);
 					pattern.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-					var image = document.createElementNS("http://www.w3.org/2000/svg", 'image');
-					pattern.appendChild( image );
-					image.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', node.data.keys.image );
-					image.setAttribute('x', '0');
-					image.setAttribute('y', '0');
-					image.setAttribute('width', '1');
-					image.setAttribute('height', '1');
-					image.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+					var svgimage = document.createElementNS("http://www.w3.org/2000/svg", 'image');
+					pattern.appendChild( svgimage );
+					svgimage.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', image );
+					svgimage.setAttribute('x', '0');
+					svgimage.setAttribute('y', '0');
+					svgimage.setAttribute('width', '1');
+					svgimage.setAttribute('height', '1');
+					svgimage.setAttribute('preserveAspectRatio', 'xMidYMid slice');
 					/*
 					var c = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
 					c.setAttribute('x', '0');
@@ -329,9 +334,10 @@ springy_damas.get_renderer = function( layout )
 					*/
 					circle.setAttribute('fill','url(#thumb'+node.data.id+')');
 				}
-				if(node.data.keys.type)
+				var type = (node.data.keys)? node.data.keys.type : node.data.type;
+				if(type)
 				{
-					circle.setAttribute('class', node.data.keys.type);
+					circle.setAttribute('class', type);
 				}
 				if(node.data.targets > 0)
 				{
