@@ -47,6 +47,23 @@
 	}
 */
 
+
+        damasGraph.load = function( json ){
+                var i;
+                for(i=0;i<json['nodes'].length;i++)
+                {
+                        var n = json['nodes'][i];
+                        damasGraph.newNode(n);
+                }
+                for(i=0;i<json['links'].length;i++)
+                {
+                        var l = json['links'][i];
+                        damasGraph.newEdge( l );
+                }
+                return true;
+        }
+
+
 	damasGraph.init_SVG = function ( )
 	{
 		var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");

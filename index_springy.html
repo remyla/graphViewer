@@ -2,12 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-		<link rel="stylesheet" type="text/css" href="graph_d3.css"/>
-		<script src="vendor/d3.js"></script>
+		<link rel="stylesheet" type="text/css" href="graph.css"/>
 		<script src="graph_common.js"></script>
-		<script src="graph_d3.js"></script>
+		<script src="vendor/springy.js"></script>
+		<script src="vendor/svg-pan-zoom.js"></script>
+		<script src="graph.js"></script>
 <!--
-		<script src="interactions_d3.js"></script>
+		<script src="interactions.js"></script>
 -->
 		<script type="text/javascript">//<![CDATA[ 
 			function fetchJSONFile(path, callback) {
@@ -25,17 +26,21 @@
 			}
 			document.addEventListener('DOMContentLoaded', function() {
 				damasGraph.init( document.getElementById('graph'));
-                                fetchJSONFile('json/example.json', function(data){
-                                        damasGraph.load(data);
-                                });
+				damasGraph.svg.style.height = window.innerHeight -4 + 'px';
+				fetchJSONFile('json/example.json', function(data){
+					damasGraph.load(data);
+				});
 			});
 			window.addEventListener("resize", function() {
-				damasGraph.svg.style.height = window.innerHeight + 'px';
-				damasGraph.svg.style.width = window.innerWidth + 'px';
-			});	
-			//]]>
+				damasGraph.svg.style.height = window.innerHeight -4 + 'px';
+			});
+		//]]>
 		</script>
-
+		<style>
+			body {
+				margin: 0;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="graph"></div>
