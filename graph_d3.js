@@ -13,17 +13,17 @@
 	damasGraph.init = function ( htmlelem )
 	{
 		this.svg = this.init_SVG2();
-
+		this.nodes = [];
+		this.links = [];
 		var width = window.innerWidth;
 		var height = window.innerHeight;
 		this.force = d3.layout.force()
 			.charge(-200)
 			.linkDistance(30)
 			.size([width, height])
-			.nodes([])
-			.links([]);
-		this.nodes = [];
-		this.links = [];
+			.nodes(this.nodes)
+			.links(this.links);
+
 		this.svgNodes = this.g1.selectAll('g');
 		this.svgLinks = this.g2.selectAll('line');
 		this.force.on("tick", damasGraph.tick);
@@ -166,8 +166,8 @@
 
 		// add new links
 		console.log(this.links);
-		this.svgLinks = this.svgLinks.data(this.links)
-			.enter().append("svg:line")
+		this.svgLinks = this.svgLinks.data(this.links);
+			this.svgLinks.enter().append("svg:line")
 			.attr("class", "link")
 			//.style("stroke-width", function(d) { return Math.sqrt(d.value); })
 			.style("stroke-width", '1');
