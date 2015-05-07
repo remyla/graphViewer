@@ -48,20 +48,29 @@
 */
 
 
-        damasGraph.load = function( json ){
-                var i;
-                for(i=0;i<json['nodes'].length;i++)
-                {
-                        var n = json['nodes'][i];
-                        damasGraph.newNode(n);
-                }
-                for(i=0;i<json['links'].length;i++)
-                {
-                        var l = json['links'][i];
-                        damasGraph.newEdge( l );
-                }
-                return true;
-        }
+	damasGraph.load = function( json ){
+		var i;
+		if(!json.nodes)
+		{
+			for(i=0;i<json.length;i++)
+			{
+				var n = json[i];
+				damasGraph.newNode(n);
+			}
+			return;
+		}
+		for(i=0;i<json['nodes'].length;i++)
+		{
+			var n = json['nodes'][i];
+			damasGraph.newNode(n);
+		}
+		for(i=0;i<json['links'].length;i++)
+		{
+			var l = json['links'][i];
+			damasGraph.newEdge( l );
+		}
+		return true;
+	}
 
 
 	damasGraph.init_SVG = function ( )
@@ -217,10 +226,10 @@ damassvggraph = {
 				{
 					id = text.replace(window.location.origin+window.location.pathname+'#view=', '');
 					var elem = damas.read(parseInt(id));
-                                	Object.extend( elem, damas.element_canvas );
-                                	var img = elem.imageURL();
-                                	nodes[elem.id] = graph.newNode( { 'elem':elem, 'label': elem.label(), 'damid': elem.id, 'damimg': img } );
-                                	nodes[elem.id].damelem = elem;
+					Object.extend( elem, damas.element_canvas );
+					var img = elem.imageURL();
+					nodes[elem.id] = graph.newNode( { 'elem':elem, 'label': elem.label(), 'damid': elem.id, 'damimg': img } );
+					nodes[elem.id].damelem = elem;
 				}
 				// DROP LINK
 				else

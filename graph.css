@@ -37,6 +37,11 @@ circle {
 	cursor: pointer;
 }
 
+.selected {
+	stroke: red;
+	stroke-width: 1;
+}
+
 circle.asset {
 /*
 	stroke: red;
