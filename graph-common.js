@@ -48,6 +48,19 @@
 */
 
 
+	damasGraph.selectToggle = function( node ) {
+		if (damasGraph.selection.indexOf(node) === -1 )
+		{
+			damasGraph.selection.push( node );
+		}
+		else
+		{
+			damasGraph.selection.pop( node );
+		}
+		node.shape.classList.toggle('selected');
+	}
+
+
 	damasGraph.load = function( json ){
 		var i;
 		if(!json.nodes)
@@ -55,7 +68,10 @@
 			for(i=0;i<json.length;i++)
 			{
 				var n = json[i];
-				damasGraph.newNode(n);
+				if(n.src_id && n.tgt_id)
+					damasGraph.newEdge(n);
+				else
+					damasGraph.newNode(n);
 			}
 			return;
 		}
@@ -72,6 +88,29 @@
 		return true;
 	}
 
+	damasGraph.initDebugFrame = function ( htmlelem )
+	{
+		this.debug = {};
+		var div = document.createElement("div");
+		div.setAttribute('id', 'graphDebugFrame' );
+		var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> nodes<br/><span id="graphDebugNbEdges">?</span> edges<br/>';
+		div.innerHTML = c;
+		this.debug.nbNodes = div.querySelector('#graphDebugNbNodes');
+		this.debug.nbEdges = div.querySelector('#graphDebugNbEdges');
+		htmlelem.appendChild(div);
+	}
+
+	damasGraph.refreshDebugFrame = function ( )
+	{
+		if(this.debug.nbNodes)
+		{
+			this.debug.nbNodes.innerHTML = this.nodes.length;
+		}
+		if(this.debug.nbEdges)
+		{
+			this.debug.nbEdges.innerHTML = this.links.length;
+		}
+	}
 
 	damasGraph.init_SVG = function ( )
 	{

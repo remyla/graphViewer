@@ -8,15 +8,15 @@
 	}
 }(this, function (damasGraph, Springy, svgPanZoom) {
 
-//define( ['springy', 'svg-pan-zoom' ], function( Springy, svgPanZoom ){
-
 	springy_damas = {
 		ray: 12,
 		edge_distance: 12,
 		graph_all_nodes : []
 	};
 
-	damasGraph.node_indexes = [];
+	//damasGraph.node_indexes = [];
+	damasGraph.nodes = [];
+	damasGraph.links = [];
 	damasGraph.node_lut = {};
 
 	damasGraph.init = function ( htmlelem )
@@ -25,6 +25,7 @@
 		this.springy_layout = new Springy.Layout.ForceDirected(this.springy_graph, 300.0, 300.0, 0.5);
 		this.svg = this.init_SVG();
 		htmlelem.appendChild(this.svg);
+		this.initDebugFrame(htmlelem);
 
 		this.svgpanzoominstance = svgPanZoom('#svggraph', { minZoom: 0.1, maxZoom: 10 } );
 		springy_damas.currentBB = this.springy_layout.getBoundingBox();
@@ -33,11 +34,15 @@
 	}
 
 	damasGraph.newNode = function( node ){
-		if (this.node_lut[node.id]) return false;
-		this.node_indexes.push(node.id);
+		// backward compatibility
+		if(node.id && !node._id) node._id = node.id;
+		if (this.node_lut[node._id]) return false;
+		//this.node_indexes.push(node._id);
+		this.nodes.push(node);
 		var springy_node = this.springy_graph.newNode(node);
-		this.node_lut[node.id] = springy_node.id;
-		//this.node_lut[springy_node.id] = node.id;
+		this.node_lut[node._id] = springy_node.id;
+		//this.node_lut[springy_node.id] = node._id;
+		this.refreshDebugFrame();
 		return true;
 	}
 
@@ -47,10 +52,14 @@
 		var springy_source_node = this.springy_graph.nodes[springy_source_id];
 		var springy_target_node = this.springy_graph.nodes[springy_target_id];
 		this.springy_graph.newEdge(springy_source_node, springy_target_node);
+		this.links.push(l);
+		this.refreshDebugFrame();
+		return true;
 	}
 
 	damasGraph.removeNode = function( node ){
 		this.selection.pop(node);
+		this.nodes.pop(node);
 		node.shape.parentNode.removeChild(node.shape);
 		this.springy_graph.removeNode( node );
 	}
@@ -65,9 +74,11 @@
 		while(this.g2.firstChild)
 			this.g2.removeChild(this.g2.firstChild);
 		this.node_lut = {};
-		this.node_indexes.length = 0;
+		//this.node_indexes.length = 0;
 		this.springy_graph.nextNodeId = 0;
 		this.springy_graph.nextLinkId = 0;
+		this.nodes.length = 0;
+		this.links.length = 0;
 		return true;
 	}
 
