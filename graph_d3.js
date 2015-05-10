@@ -166,8 +166,8 @@
 
 		// add new links
 		console.log(this.links);
-		this.svgLinks = this.svgLinks.data(this.links)
-			.enter().append("svg:line")
+		this.svgLinks = this.svgLinks.data(this.links);
+		this.svgLinks.enter().append("svg:line")
 			.attr("class", "link")
 			//.style("stroke-width", function(d) { return Math.sqrt(d.value); })
 			.style("stroke-width", '1');
