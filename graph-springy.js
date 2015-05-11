@@ -8,6 +8,7 @@
 	}
 }(this, function (damasGraph, Springy, svgPanZoom) {
 
+
 	springy_damas = {
 		ray: 12,
 		edge_distance: 12,
@@ -15,17 +16,15 @@
 	};
 
 	//damasGraph.node_indexes = [];
-	damasGraph.nodes = [];
-	damasGraph.links = [];
-	damasGraph.node_lut = {};
+	damasGraph.prototype.springy_lut = {};
 
-	damasGraph.init = function ( htmlelem )
+	//damasGraph.prototype.init = function ( htmlelem )
+	damasGraph.prototype.init = function ( htmlelem )
 	{
 		this.springy_graph = new Springy.Graph();
 		this.springy_layout = new Springy.Layout.ForceDirected(this.springy_graph, 300.0, 300.0, 0.5);
 		this.svg = this.init_SVG();
 		htmlelem.appendChild(this.svg);
-		this.initDebugFrame(htmlelem);
 
 		this.svgpanzoominstance = svgPanZoom('#svggraph', { minZoom: 0.1, maxZoom: 10 } );
 		springy_damas.currentBB = this.springy_layout.getBoundingBox();
@@ -33,41 +32,44 @@
 		this.springy_renderer.start();
 	}
 
-	damasGraph.newNode = function( node ){
-		// backward compatibility
-		if(node.id && !node._id) node._id = node.id;
-		if (this.node_lut[node._id]) return false;
-		//this.node_indexes.push(node._id);
-		this.nodes.push(node);
-		var springy_node = this.springy_graph.newNode(node);
-		this.node_lut[node._id] = springy_node.id;
-		//this.node_lut[springy_node.id] = node._id;
-		this.refreshDebugFrame();
-		return true;
+	damasGraph.prototype.newNode = function( node )
+	{
+		if (this._newNode(node))
+		{
+			var springy_node = this.springy_graph.newNode(node);
+			if(node.id && !node._id) node._id = node.id; // backward compatibility
+			this.springy_lut[node._id] = springy_node.id;
+			return true;
+		}
+		return false;
 	}
 
-	damasGraph.newEdge = function( l ){
-		var springy_source_id = this.node_lut[l['src_id']];
-		var springy_target_id = this.node_lut[l['tgt_id']];
-		var springy_source_node = this.springy_graph.nodes[springy_source_id];
-		var springy_target_node = this.springy_graph.nodes[springy_target_id];
-		this.springy_graph.newEdge(springy_source_node, springy_target_node);
-		this.links.push(l);
-		this.refreshDebugFrame();
-		return true;
+	damasGraph.prototype.newEdge = function( l ){
+		if (this._newEdge(l))
+		{
+			var springy_source_id = this.springy_lut[l['src_id']];
+			var springy_target_id = this.springy_lut[l['tgt_id']];
+			var springy_source_node = this.springy_graph.nodes[springy_source_id];
+			var springy_target_node = this.springy_graph.nodes[springy_target_id];
+			this.springy_graph.newEdge(springy_source_node, springy_target_node);
+			return true;
+		}
+		return false;
 	}
 
-	damasGraph.removeNode = function( node ){
-		this.selection.pop(node);
-		this.nodes.pop(node);
-		node.shape.parentNode.removeChild(node.shape);
-		this.springy_graph.removeNode( node );
+	damasGraph.prototype.removeNode = function( node ){
+
+		if (this.removeNode(node))
+		{
+			node.shape.parentNode.removeChild(node.shape);
+			this.springy_graph.removeNode( node );
+		}
 	}
 
 	/**
 	 * Clear the graph
 	 */
-	damasGraph.erase = function( ){
+	damasGraph.prototype.erase = function( ){
 		this.springy_graph.filterNodes( function(){return false} );
 		while(this.g1.firstChild)
 			this.g1.removeChild(this.g1.firstChild);
@@ -92,7 +94,7 @@
 				if( !edge.shape )
 				{
 					edge.shape = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-					damasGraph.g1.appendChild( edge.shape );
+					graph.g1.appendChild( edge.shape );
 					if( edge.source.data.time > edge.target.data.time )
 					//if( edge.source.data.keys.time > edge.target.data.keys.time )
 					{
@@ -190,7 +192,7 @@
 					if (image)
 					{
 						pattern = document.createElementNS("http://www.w3.org/2000/svg", 'pattern');
-						damasGraph.defs.appendChild(pattern);
+						graph.defs.appendChild(pattern);
 						pattern.setAttribute('id', 'thumb'+node.data.id);
 						pattern.setAttribute('patternContentUnits', 'objectBoundingBox');
 						pattern.setAttribute('x', '0');
@@ -233,7 +235,7 @@
 					node.plus.setAttribute('width', 5);
 					node.plus.setAttribute('height', 5);
 
-					damasGraph.g2.appendChild(a);
+					graph.g2.appendChild(a);
 
 					circle.addEventListener( 'click', function(e){
 						if(window['node_pressed']){
@@ -266,6 +268,9 @@
 		var py = (s.y / springy_damas.viewport.getBBox().height) * size.y + springy_damas.currentBB.bottomleft.y;
 		return new Springy.Vector(px, py);
 	};
+
+
+	//var damasGraph = new damasGraph();
 
 	return damasGraph;
 

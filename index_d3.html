@@ -25,14 +25,14 @@
 				httpRequest.send();
 			}
 			document.addEventListener('DOMContentLoaded', function() {
-				damasGraph.init( document.getElementById('graph'));
+				graph = new damasGraph( document.getElementById('graph'));
                                 fetchJSONFile('json/example.json', function(data){
-                                        damasGraph.load(data);
+                                        graph.load(data);
                                 });
 			});
 			window.addEventListener("resize", function() {
-				damasGraph.svg.style.height = window.innerHeight + 'px';
-				damasGraph.svg.style.width = window.innerWidth + 'px';
+				graph.svg.style.height = window.innerHeight + 'px';
+				graph.svg.style.width = window.innerWidth + 'px';
 			});	
 			//]]>
 		</script>
