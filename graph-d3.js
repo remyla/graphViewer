@@ -13,6 +13,7 @@
 	damasGraph.init = function ( htmlelem )
 	{
 		this.svg = this.init_SVG2();
+		this.initDebugFrame(htmlelem);
 
 		var width = window.innerWidth;
 		var height = window.innerHeight;
@@ -81,6 +82,7 @@
 		this.nodes.push( node );
 		this.node_lut[node.id] = node;
 		this.restart();
+		this.refreshDebugFrame();
 		return true;
 	}
 
@@ -97,6 +99,7 @@
 			target: this.node_lut[link.tgt_id]
 		});
 		this.restart();
+		this.refreshDebugFrame();
 		return true;
 	}
 
@@ -205,9 +208,8 @@
 		g.call(this.force.drag);
 
 		// add new links
-		console.log(this.links);
-		this.svgLinks = this.svgLinks.data(this.links)
-			.enter().append("svg:line")
+		this.svgLinks = this.svgLinks.data(this.links);
+		this.svgLinks.enter().append("svg:line")
 			.attr("class", "link")
 			//.style("stroke-width", function(d) { return Math.sqrt(d.value); })
 			.style("stroke-width", '1');
