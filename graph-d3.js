@@ -130,7 +130,7 @@
 			assetOverlay(d);
 		});
 
-		var patImage = this.defs.selectAll(".node")
+		var patImage = this.defs.selectAll("pattern")
 			.data(this.nodes)
 			.enter().append('svg:pattern')
 			.attr('patternContentUnits', 'objectBoundingBox')
