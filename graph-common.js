@@ -8,60 +8,30 @@
 	}
 }(this, function () {
 
-	var damasGraph = {
-		//node_indexes: [],
-		//node_lut: {},
-	};
-
-/*
-	damasGraph.init = function ( htmlelem )
-	{
-		//window.Springy = Springy;
-		this.springy_graph = new Springy.Graph();
-		this.springy_layout = new Springy.Layout.ForceDirected(this.springy_graph, 300.0, 300.0, 0.5);
-		//this.svg = damassvggraph.getSVG();
-		this.svg = this.init_SVG();
-		htmlelem.appendChild(this.svg);
-
-		this.svgpanzoominstance = svgPanZoom('#svggraph', { minZoom: 0.1, maxZoom: 10 } );
-		springy_damas.currentBB = this.springy_layout.getBoundingBox();
-		this.springy_renderer = springy_damas.get_renderer( this.springy_layout );
-		this.springy_renderer.start();
+	// Constructor
+	function damasGraph( htmlelem ) {
+		this.nodes = [];
+		this.links = [];
+		this.selection = [];
+		this.node_lut = {};
+		this.initDebugFrame(htmlelem);
+		this.init(htmlelem);
+		this.refreshDebugFrame();
 	}
 
-	damasGraph.newNode = function( node ){
-		if (this.node_lut[node.id]) return false;
-		this.node_indexes.push(node.id);
-		var springy_node = this.springy_graph.newNode(node);
-		this.node_lut[node.id] = springy_node.id;
-		//this.node_lut[springy_node.id] = node.id;
-		return true;
-	}
-
-	damasGraph.newEdge = function( source, target ){
-		springy_source_id = this.node_lut[source];
-		springy_target_id = this.node_lut[target];
-		springy_source_node = this.springy_graph.nodes[springy_source_id];
-		springy_target_node = this.springy_graph.nodes[springy_target_id];
-		this.springy_graph.newEdge(springy_source_node, springy_target_node);
-	}
-*/
-
-
-	damasGraph.selectToggle = function( node ) {
-		if (damasGraph.selection.indexOf(node) === -1 )
+	damasGraph.prototype.selectToggle = function( node ) {
+		if (this.selection.indexOf(node) === -1 )
 		{
-			damasGraph.selection.push( node );
+			this.selection.push( node );
 		}
 		else
 		{
-			damasGraph.selection.pop( node );
+			this.selection.pop( node );
 		}
 		node.shape.classList.toggle('selected');
 	}
 
-
-	damasGraph.load = function( json ){
+	damasGraph.prototype.load = function( json ){
 		var i;
 		if(!json.nodes)
 		{
@@ -69,38 +39,64 @@
 			{
 				var n = json[i];
 				if(n.src_id && n.tgt_id)
-					damasGraph.newEdge(n);
+					this.newEdge(n);
 				else
-					damasGraph.newNode(n);
+					this.newNode(n);
 			}
 			return;
 		}
 		for(i=0;i<json['nodes'].length;i++)
 		{
 			var n = json['nodes'][i];
-			damasGraph.newNode(n);
+			this.newNode(n);
 		}
 		for(i=0;i<json['links'].length;i++)
 		{
 			var l = json['links'][i];
-			damasGraph.newEdge( l );
+			this.newEdge( l );
 		}
 		return true;
 	}
 
-	damasGraph.initDebugFrame = function ( htmlelem )
+	damasGraph.prototype._newNode = function( node )
+	{
+                if(node.id && !node._id) node._id = node.id; // backward compatibility
+		if (this.node_lut[node._id]) return false;
+		this.nodes.push(node);
+		this.node_lut[node._id] = node;
+		this.refreshDebugFrame();
+		return true;
+	}
+
+	damasGraph.prototype._newEdge = function( node )
+	{
+		this.links.push(node);
+		this.refreshDebugFrame();
+		return true;
+	}
+
+	damasGraph.prototype._removeNode = function( node )
+	{
+		this.selection.pop(node);
+		this.nodes.pop(node);
+		node.shape.parentNode.removeChild(node.shape);
+		this.springy_graph.removeNode( node );
+		return true;
+	}
+
+	damasGraph.prototype.initDebugFrame = function ( htmlelem )
 	{
 		this.debug = {};
 		var div = document.createElement("div");
 		div.setAttribute('id', 'graphDebugFrame' );
-		var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> nodes<br/><span id="graphDebugNbEdges">?</span> edges<br/>';
+		var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> node(s)<br/><span id="graphDebugNbEdges">?</span> edge(s)<br/>';
 		div.innerHTML = c;
 		this.debug.nbNodes = div.querySelector('#graphDebugNbNodes');
 		this.debug.nbEdges = div.querySelector('#graphDebugNbEdges');
 		htmlelem.appendChild(div);
 	}
 
-	damasGraph.refreshDebugFrame = function ( )
+	damasGraph.prototype.refreshDebugFrame = function ( )
 	{
 		if(this.debug.nbNodes)
 		{
@@ -112,7 +108,7 @@
 		}
 	}
 
-	damasGraph.init_SVG = function ( )
+	damasGraph.prototype.init_SVG = function ( )
 	{
 		var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
