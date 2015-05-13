@@ -18,14 +18,13 @@
 		var height = window.innerHeight;
 		htmlelem.appendChild(this.svg);
 
-		this.svg = d3.select("#graph");
-		this.svg.select("#svggraph")
-		.attr("viewBox", "0 0 " + width + " " + height )
-		.attr("preserveAspectRatio", "xMidYMid meet")
-		.attr("pointer-events", "all")
-		.call(d3.behavior.zoom().on("zoom", rescale));
+		svg = d3.select("#svggraph")
+			.attr("viewBox", "0 0 " + width + " " + height )
+			.attr("preserveAspectRatio", "xMidYMid meet")
+			.attr("pointer-events", "all")
+			.call(d3.behavior.zoom().on("zoom", rescale));
 
-		this.defs = this.svg.select("defs");
+		this.defs = d3.select("defs");
 		var gBox = d3.select(this.gBox).attr("pointer-events", "all");
 
 		function rescale() {
@@ -44,6 +43,8 @@
 			.links([]);
 		this.nodes = [];
 		this.links = [];
+//		this.svgNodes = this.g1.selectAll('g');
+//		this.svgLinks = this.g2.selectAll('path');
 		this.svgNodes = d3.select(this.g1).selectAll('g');
 		this.svgLinks = d3.select(this.g2).selectAll('path');
 		this.force.on("tick", this.tick);
@@ -156,76 +157,13 @@
 			.attr('height', 1);
 
 		var image = patImage.append('image')
-//			.attr('xlink:href', function(d) { return assetsURL + d.keys.image })
+			.attr('xlink:href', function(d) { if (d.keys.image) {return assetsURL + d.keys.image} })
 			.attr('x', '0')
 			.attr('y', '0')
 			.attr('width', 1)
 			.attr('height', 1)
 			.attr('preserveAspectRatio', 'xMidYMid slice');
-		
-		var extText = patImage.append('text')
-			.attr('text-anchor', 'middle')
-			.attr('dominant-baseline', 'central')
-			.attr('font-family', 'arial')
-			.attr('font-size', '12px');
-		
-//		patImage.append( function(d) { 
-//			if (d.keys.image) {
-////				var image = document.createElementNS("http://www.w3.org/2000/svg", "image");
-////				image.attr('xlink:href', function(d) { return assetsURL + d.keys.image })
-////				.attr('x', '0')
-////				.attr('y', '0')
-////				.attr('width', 1)
-////				.attr('height', 1)
-////				.attr('preserveAspectRatio', 'xMidYMid slice');
-//				return "image"
-//			}
-//			if (d.keys.file) {
-////				var extension = d.keys.file.split(".").pop().toLowerCase();
-////				var extText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-////				extText.text(extension)
-////				.attr('font-family', 'arial')
-////				.attr('font-size', '12px');
-////				return extText
-//			}
-//		});
-		
-		image.attr('xlink:href', function(d) { 
-			if (d.keys.image) {
-				return assetsURL + d.keys.image
-			}
-		});
-//		
-//		extText.text(function(d) { 
-//			if (d.keys.file) {
-//				var extension = d.keys.file.split(".").pop().toLowerCase();
-//				return extension
-//			}
-//		});
-		
-		
-		
-//		image.attr('xlink:href', function(d) { 
-//			if (d.keys.image) {
-//				return assetsURL + d.keys.image
-//			}
-//			else {
-//				if (d.keys.file) {
-//					return thumb(d.keys.file)
-//				}
-//			}
-//		});
-		
-//		if (d.keys.image) {
-////			damasGraph.patThumb.thumb.attr('xlink:href', function(d) { return assetsURL + d.keys.image });
-//			image.attr('xlink:href', function(d) { return assetsURL + d.keys.image });
-//		}
-//		else {
-////			damasGraph.patThumb.thumb.attr('xlink:href', function(d) { return assetsURL + d.keys.image });
-//			image.attr('xlink:href', function(d) { return thumb(d.keys.file) });
-//		}
-
-		
+			
 		var tools = g.append('svg:g')
 			.attr("class", "tools")
 			.style('opacity', '0');
@@ -288,7 +226,6 @@
 		this.svgLinks.enter().append("svg:path")
 			.attr("class", "link")
 			.style("marker-end",  "url(#arrow)")
-			//.style("stroke-width", function(d) { return Math.sqrt(d.value); })
 			.style("stroke-width", '1');
 
 		this.force.start();
