@@ -12,10 +12,30 @@
 
 	damasGraph.prototype.init = function ( htmlelem )
 	{
-		this.svg = this.init_SVG2();
+		this.svg = this.init_SVG();
 
 		var width = window.innerWidth;
 		var height = window.innerHeight;
+		htmlelem.appendChild(this.svg);
+
+		this.svg = d3.select("#graph");
+		this.svg.select("#svggraph")
+		.attr("viewBox", "0 0 " + width + " " + height )
+		.attr("preserveAspectRatio", "xMidYMid meet")
+		.attr("pointer-events", "all")
+		.call(d3.behavior.zoom().on("zoom", rescale));
+
+		this.defs = this.svg.select("defs");
+		var gBox = d3.select(this.gBox).attr("pointer-events", "all");
+
+		function rescale() {
+			trans=d3.event.translate;
+			scale=d3.event.scale;
+			gBox.attr("transform",
+			"translate(" + trans + ")"
+			+ " scale(" + scale + ")");
+		}
+
 		this.force = d3.layout.force()
 			.charge(-200)
 			.linkDistance(30)
@@ -24,8 +44,8 @@
 			.links([]);
 		this.nodes = [];
 		this.links = [];
-		this.svgNodes = this.g1.selectAll('g');
-		this.svgLinks = this.g2.selectAll('line');
+		this.svgNodes = d3.select(this.g1).selectAll('g');
+		this.svgLinks = d3.select(this.g2).selectAll('path');
 		this.force.on("tick", this.tick);
 
 
@@ -265,37 +285,30 @@
 
 		// add new links
 		this.svgLinks = this.svgLinks.data(this.links);
-		this.svgLinks.enter().append("svg:line")
+		this.svgLinks.enter().append("svg:path")
 			.attr("class", "link")
+			.style("marker-end",  "url(#arrow)")
 			//.style("stroke-width", function(d) { return Math.sqrt(d.value); })
 			.style("stroke-width", '1');
-			//.style("marker-end",  "url(#arrow)");
-
-		var arrow = this.defs.selectAll("marker")
-			.data(this.links)
-			.enter().append("svg:marker")
-			.attr("id", "arrow")
-			.attr("viewBox", "0 -5 10 10")
-			.attr("refX", 25)
-			.attr("refY", 0)
-			.attr("markerWidth", 6)
-			.attr("markerHeight", 6)
-			.attr("orient", "auto")
-			.append("svg:path")
-			.attr("d", "M0,-5L10,0L0,5 L10,0 L0, -5")
-			.style("stroke", "#4679BD")
-			.style("opacity", "0.6");
-
 
 		this.force.start();
 	}
 	damasGraph.prototype.tick = function ( )
 	{
-		graph.svgLinks.attr("x1", function(d) { return d.source.x; })
-			.attr("y1", function(d) { return d.source.y; })
-			.attr("x2", function(d) { return d.target.x; })
-			.attr("y2", function(d) { return d.target.y; });
-
+		graph.svgLinks.attr('d', function(d) {
+		    var deltaX = d.target.x - d.source.x,
+		        deltaY = d.target.y - d.source.y,
+		        dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+		        normX = deltaX / dist,
+		        normY = deltaY / dist,
+		        sourcePadding = d.left ? 17 : 10.5,
+		        targetPadding = d.right ? 17 : 12,
+		        sourceX = d.source.x + (sourcePadding * normX),
+		        sourceY = d.source.y + (sourcePadding * normY),
+		        targetX = d.target.x - (targetPadding * normX),
+		        targetY = d.target.y - (targetPadding * normY);
+		    return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
+		});
 		graph.svgNodes.attr('transform', function(d) {
 			return 'translate(' + d.x + ',' + d.y + ')';
 		});
