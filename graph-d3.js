@@ -125,20 +125,29 @@
 			.attr("r", 10)
 			.attr("class", "nodeBG");
 		g.append('svg:circle')
+			.attr("id", function(d) { return "thumb"+d.id; })
 			.attr("r", 10)
-			.attr("fill", function(d) { return "url(#thumb"+d.id+")"; })
+			.attr("fill", function(d) { return "url(#thumbPat"+d.id+")"; })
 			.attr("class", "node");
+//		g.append('svg:image')
+//			.attr('id', function(d) { return "thumb"+d.id; })
+//			.attr('xlink:href', function(d) {return  thumbnail(d);})
+//			.attr('x', '0')
+//			.attr('y', '0');
 		g.append('svg:text')
+			.attr("class", "label")
 			.attr("dx", 12)
 			.attr("dy", ".35em")
 			.text(function(d) { if(d.keys.file) return d.keys.file.split('/').pop() });
 //				.text(function(d) { return d.id });
 //				.style("stroke", "white");
 		g.append('svg:text')
+			.attr("class", "extText")
 			.attr('text-anchor', 'middle')
 			.attr("dx", 0)
-			.attr("dy", 2)
+			.attr("dy", 7)
 			.text(function(d) { if(d.keys.file && !d.keys.image) return d.keys.file.split(".").pop().toUpperCase() });
+		
 		g.append("a")
 			.attr('xlink:href', function(d) { return '#'+d.id })
 		g.on("click", function(d) {
@@ -150,20 +159,24 @@
 			.data(this.nodes)
 			.enter().append('svg:pattern')
 			.attr('patternContentUnits', 'objectBoundingBox')
-			.attr('id', function(d) { return "thumb"+d.id; })
+			.attr('id', function(d) { return "thumbPat"+d.id; })
 			.attr('x', '0')
 			.attr('y', '0')
 			.attr('width', 1)
 			.attr('height', 1);
 
 		var image = patImage.append('image')
-			.attr('xlink:href', function(d) { if (d.keys.image) {return assetsURL + d.keys.image} })
+			.attr('id','thumbnail')
 			.attr('x', '0')
 			.attr('y', '0')
 			.attr('width', 1)
-			.attr('height', 1)
-			.attr('preserveAspectRatio', 'xMidYMid slice');
-			
+			.attr('height', 1);
+//			.attr('preserveAspectRatio', 'xMidYMid slice');
+		
+		image.attr('xlink:href', function(d) {
+				return  thumbnail(d);
+			});
+		
 		var tools = g.append('svg:g')
 			.attr("class", "tools")
 			.style('opacity', '0');
