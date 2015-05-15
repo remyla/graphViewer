@@ -142,7 +142,15 @@
 		this.force.links(this.links);
 		this.force.nodes(this.nodes);
 		// add new nodes
-		this.svgNodes = this.svgNodes.data( this.nodes, function(d){ return d.id });
+		this.svgNodes = this.svgNodes.data( this.nodes, function(d){ 
+			if("id" in d)
+			{
+				return d.id;
+			}
+			else if("_id" in d)
+			{
+				return d._id;
+			}});
 		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
 				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
 				.on("drag", function(d) { graph.drag(); }))
@@ -152,21 +160,59 @@
 			.attr("class", "nodeBG");
 		g.append('svg:circle')
 			.attr("r", 10)
-			.attr("fill", function(d) { return "url(#thumb"+d.id+")"; })
+			.attr("fill", function(d) { 
+				if("id" in d)
+				{
+					return "url(#thumb"+d.id+")";
+				}
+				else if("_id" in d)
+				{
+					return "url(#thumb"+d._id+")";
+				}})
 			.attr("class", "node");
 		g.append('svg:text')
 			.attr("dx", 12)
 			.attr("dy", ".35em")
-			.text(function(d) { if(d.keys.file) return d.keys.file.split('/').pop() });
+			.text(function(d) { 
+				if("file" in d)
+				{
+					return d.file.split('/').pop();
+				}
+				if(("keys" in d))
+				{
+					if("file" in d.keys)
+					{
+						return d.keys.file.split('/').pop();
+					}
+				}});
 //				.text(function(d) { return d.id });
 //				.style("stroke", "white");
 		g.append('svg:text')
 			.attr('text-anchor', 'middle')
 			.attr("dx", 0)
 			.attr("dy", 2)
-			.text(function(d) { if(d.keys.file && !d.keys.image) return d.keys.file.split(".").pop().toUpperCase() });
+			.text(function(d) {
+				if("file" in d  && !image in d)
+				{
+					return d.file.split(".").pop().toUpperCase();
+				}
+				else if("keys" in d)
+				{
+					if("file" in d.keys && !"image" in d.keys)
+					{
+						return d.keys.file.split(".").pop().toUpperCase();
+					}
+				}});
 		g.append("a")
-			.attr('xlink:href', function(d) { return '#'+d.id })
+			.attr('xlink:href', function(d) {
+				if(d.id)
+				{
+					return '#'+d.id;
+				}
+				else if(d._id)
+				{
+					return '#'+d._id
+				}})
 		g.on("click", function(d) {
 			if (d3.event.defaultPrevented) return; // click suppressed
 			assetOverlay(d);
@@ -176,14 +222,36 @@
 			.data(this.nodes)
 			.enter().append('svg:pattern')
 			.attr('patternContentUnits', 'objectBoundingBox')
-			.attr('id', function(d) { return "thumb"+d.id; })
+			.attr('id', function(d) { if("id" in d)
+				{
+					return "thumb"+d.id;
+				}
+				else if("_id" in d)
+				{
+					return "thumb"+d._id;
+				}})
 			.attr('x', '0')
 			.attr('y', '0')
 			.attr('width', 1)
 			.attr('height', 1);
 
 		var image = patImage.append('image')
-			.attr('xlink:href', function(d) { if (d.keys.image) {return assetsURL + d.keys.image} })
+			.attr('xlink:href', function(d) { 
+				if ("image" in d)
+				{
+					return d.image;
+				}
+				else if ("keys" in d)
+				{
+					if("image" in d.keys)
+					{
+						return d.keys.image;
+					}
+				}
+				else
+				{
+					return "#"
+				}})
 			.attr('x', '0')
 			.attr('y', '0')
 			.attr('width', 1)
@@ -231,7 +299,15 @@
 			.attr('y', '8')
 			.attr('width', 4)
 			.attr('height', 4)
-			.on('click', function (d) { alert( d.id)});
+			.on('click', function (d) { 
+				if("id" in d)
+				{
+					alert( d.id);
+				}
+				else if("_id" in d)
+				{
+					alert(d._id);
+				}});
 
 		g.on("mouseover", function(d) {
 			var nodeSelection = d3.select(this);
