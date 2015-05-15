@@ -43,6 +43,29 @@
 			.links([]);
 		this.nodes = [];
 		this.links = [];
+
+		this.drag = function()
+		{	d3.behavior.drag()
+			return this.force.drag()
+			.on("dragstart", dragstarted)
+			.on("drag", dragged)
+			.on("dragend", dragended);
+		}
+
+		function dragstarted(d) {
+			d3.event.sourceEvent.stopPropagation();
+			d3.select(this).classed("dragging", true);
+			//graph.force.start();
+		}
+
+		function dragged(d) {
+			d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+		}
+
+		function dragended(d) {
+			d3.select(this).classed("dragging", false);
+		}
+
 //		this.svgNodes = this.g1.selectAll('g');
 //		this.svgLinks = this.g2.selectAll('path');
 		this.svgNodes = d3.select(this.g1).selectAll('g');
@@ -120,7 +143,10 @@
 		this.force.nodes(this.nodes);
 		// add new nodes
 		this.svgNodes = this.svgNodes.data( this.nodes, function(d){ return d.id });
-		var g = this.svgNodes.enter().append('svg:g');
+		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
+				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
+				.on("drag", function(d) { graph.drag(); }))
+			;
 		g.append("circle")
 			.attr("r", 10)
 			.attr("class", "nodeBG");
@@ -219,7 +245,7 @@
 		//damasGraph.svgNodes.append("title")
 			//.text(function(d) { return d.type; });
 
-		g.call(this.force.drag);
+		//g.call(this.force.drag);
 
 		// add new links
 		this.svgLinks = this.svgLinks.data(this.links);
