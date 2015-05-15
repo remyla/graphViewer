@@ -193,7 +193,7 @@
 					{
 						pattern = document.createElementNS("http://www.w3.org/2000/svg", 'pattern');
 						graph.defs.appendChild(pattern);
-						pattern.setAttribute('id', 'thumb'+node.data.id);
+						pattern.setAttribute('id', 'thumb'+node.data._id);
 						pattern.setAttribute('patternContentUnits', 'objectBoundingBox');
 						pattern.setAttribute('x', '0');
 						pattern.setAttribute('y', '0');
@@ -217,7 +217,7 @@
 						c.setAttribute('fill', 'none');
 						pattern.appendChild( c );
 						*/
-						circle.setAttribute('fill','url(#thumb'+node.data.id+')');
+						circle.setAttribute('fill','url(#thumb'+node.data._id+')');
 					}
 					var type = (node.data.keys)? node.data.keys.type : node.data.type;
 					if(type)
