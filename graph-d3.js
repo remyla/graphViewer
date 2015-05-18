@@ -151,9 +151,9 @@
 			.attr("r", 10)
 			.attr("class", "nodeBG");
 		g.append('svg:circle')
-			.attr("id", function(d) { return "thumb"+d.id; })
+			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)
-			.attr("fill", function(d) { return "url(#thumbPat"+d.id+")"; })
+			.attr("fill", function(d) { return "url(#thumbPat"+d._id+")"; })
 			.attr("class", "node");
 //		g.append('svg:image')
 //			.attr('id', function(d) { return "thumb"+d.id; })
@@ -164,7 +164,7 @@
 			.attr("class", "label")
 			.attr("dx", 12)
 			.attr("dy", ".35em")
-			.text(function(d) { if(d.keys.file) return d.keys.file.split('/').pop() });
+			.text(function(d) { if(d.file) return d.file.split('/').pop() });
 //				.text(function(d) { return d.id });
 //				.style("stroke", "white");
 		g.append('svg:text')
@@ -172,10 +172,10 @@
 			.attr('text-anchor', 'middle')
 			.attr("dx", 0)
 			.attr("dy", 7)
-			.text(function(d) { if(d.keys.file && !d.keys.image) return d.keys.file.split(".").pop().toUpperCase() });
+			.text(function(d) { if(d.file && !d.image) return d.file.split(".").pop().toUpperCase() });
 		
 		g.append("a")
-			.attr('xlink:href', function(d) { return '#'+d.id })
+			.attr('xlink:href', function(d) { return '#'+d._id })
 		g.on("click", function(d) {
 			if (d3.event.defaultPrevented) return; // click suppressed
 			assetOverlay(d);
@@ -185,7 +185,7 @@
 			.data(this.nodes)
 			.enter().append('svg:pattern')
 			.attr('patternContentUnits', 'objectBoundingBox')
-			.attr('id', function(d) { return "thumbPat"+d.id; })
+			.attr('id', function(d) { return "thumbPat"+d._id; })
 			.attr('x', '0')
 			.attr('y', '0')
 			.attr('width', 1)
@@ -244,7 +244,7 @@
 			.attr('y', '8')
 			.attr('width', 4)
 			.attr('height', 4)
-			.on('click', function (d) { alert( d.id)});
+			.on('click', function (d) { alert( d._id)});
 
 		g.on("mouseover", function(d) {
 			var nodeSelection = d3.select(this);
@@ -262,10 +262,17 @@
 
 		// add new links
 		this.svgLinks = this.svgLinks.data(this.links);
-		this.svgLinks.enter().append("svg:path")
+//		this.svgLinks = this.svgLinks.data( this.links, function(l){ return l.id });
+		var lin = this.svgLinks.enter().append("svg:path")
 			.attr("class", "link")
 			.style("marker-end",  "url(#arrow)")
 			.style("stroke-width", '1');
+		
+		lin.on("click", function(l) {
+			if (d3.event.defaultPrevented) return; // click suppressed
+			test(l);
+		});
+		
 
 		this.force.start();
 	}
