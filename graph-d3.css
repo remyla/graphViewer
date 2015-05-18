@@ -81,8 +81,8 @@ body {
 }
 
 .link {
-	stroke: #999;
-	stroke-opacity: .6;
+	stroke: #364e64;
+/*	stroke-opacity: .6;*/
 }
 
 .label {

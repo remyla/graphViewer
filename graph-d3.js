@@ -124,11 +124,11 @@
 	{
 		for( l in this.force.links )
 		{
-			if (l.id === link.link_id) return false;
+			if (l.id === link._id) return false;
 		}
 		//if (this.force.links[node.id]) return false;
 		this.links.push({
-			id: link.link_id,
+			id: link._id,
 			source: this.node_lut[link.src_id],
 			target: this.node_lut[link.tgt_id]
 		});
@@ -142,18 +142,22 @@
 		this.force.links(this.links);
 		this.force.nodes(this.nodes);
 		// add new nodes
-		this.svgNodes = this.svgNodes.data( this.nodes, function(d){ return d.id });
+		this.svgNodes = this.svgNodes.data( this.nodes, function(d){
+			return (d.id)? d.id : d._id;
+		});
 		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
 				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
-				.on("drag", function(d) { graph.drag(); }))
-			;
+				.on("drag", function(d) { graph.drag(); }));
+		
 		g.append("circle")
 			.attr("r", 10)
 			.attr("class", "nodeBG");
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)
-			.attr("fill", function(d) { return "url(#thumbPat"+d._id+")"; })
+			.attr("fill", function(d) {
+				return (d.id)? "url(#thumbPat"+d.id+")" : "url(#thumbPat"+d._id+")";
+			})
 			.attr("class", "node");
 //		g.append('svg:image')
 //			.attr('id', function(d) { return "thumb"+d.id; })
@@ -164,28 +168,51 @@
 			.attr("class", "label")
 			.attr("dx", 12)
 			.attr("dy", ".35em")
-			.text(function(d) { if(d.file) return d.file.split('/').pop() });
+			.text(function(d) {
+				return (d.keys)? d.keys.file.split('/').pop() : d.file.split('/').pop();
+			});
 //				.text(function(d) { return d.id });
 //				.style("stroke", "white");
 		g.append('svg:text')
 			.attr("class", "extText")
 			.attr('text-anchor', 'middle')
 			.attr("dx", 0)
-			.attr("dy", 7)
-			.text(function(d) { if(d.file && !d.image) return d.file.split(".").pop().toUpperCase() });
-		
+			.attr("dy", 2)
+			.text(function(d) {
+				if("file" in d  && !("image" in d))
+				{
+					return d.file.split(".").pop().toUpperCase();
+				}
+				else if("keys" in d)
+				{
+					if("file" in d.keys && !("image" in d.keys))
+					{
+						return d.keys.file.split(".").pop().toUpperCase();
+					}
+				}});
 		g.append("a")
-			.attr('xlink:href', function(d) { return '#'+d._id })
+			.attr('xlink:href', function(d) {
+				return (d.id)? '#'+d.id : '#'+d._id;
+			});
+
 		g.on("click", function(d) {
 			if (d3.event.defaultPrevented) return; // click suppressed
 			assetOverlay(d);
 		});
+		
+//		g.on( 'click', function(d){
+//			if(window['node_pressed']){
+//				node_pressed.call(this, d);
+//			}
+//		});
 
 		var patImage = this.defs.selectAll("pattern")
 			.data(this.nodes)
 			.enter().append('svg:pattern')
 			.attr('patternContentUnits', 'objectBoundingBox')
-			.attr('id', function(d) { return "thumbPat"+d._id; })
+			.attr('id', function(d) {
+				return (d.id)? "thumbPat"+d.id : "thumbPat"+d._id;
+			})
 			.attr('x', '0')
 			.attr('y', '0')
 			.attr('width', 1)
@@ -193,15 +220,18 @@
 
 		var image = patImage.append('image')
 			.attr('id','thumbnail')
+			.attr('xlink:href', function(d) {
+				return (d.keys)? d.keys.image : d.image;
+			})
 			.attr('x', '0')
 			.attr('y', '0')
 			.attr('width', 1)
 			.attr('height', 1);
 //			.attr('preserveAspectRatio', 'xMidYMid slice');
 		
-		image.attr('xlink:href', function(d) {
-				return  thumbnail(d);
-			});
+//		image.attr('xlink:href', function(d) {
+//				return  thumbnail(d);
+//			});
 		
 		var tools = g.append('svg:g')
 			.attr("class", "tools")
@@ -243,8 +273,7 @@
 			.attr('x', '-12')
 			.attr('y', '8')
 			.attr('width', 4)
-			.attr('height', 4)
-			.on('click', function (d) { alert( d._id)});
+			.attr('height', 4);
 
 		g.on("mouseover", function(d) {
 			var nodeSelection = d3.select(this);
