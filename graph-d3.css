@@ -52,27 +52,40 @@ body {
 }
 
 .node {
+/*
 	stroke: #fff;
 	stroke-width: 1px;
+*/
 }
 	
 .nodeBG {
 	fill: #bebebe;
+	stroke: #fff;
+	stroke-width: 1px;
 }
 
+.icon {
+	width: 2px;
+	height: 2px;
+}
 .tools {
 	transition: opacity 400ms ease;
+}
+
+.extText {
+	font: 5px arial;
+	fill: black;
 }
 .openPlus {
 	fill: white;
 }
 
 .link {
-	stroke: #999;
-	stroke-opacity: .6;
+	stroke: #364e64;
+/*	stroke-opacity: .6;*/
 }
 
-text {
+.label {
 	font: 6px arial;
 	fill:white;
 /*	stroke:white;*/
