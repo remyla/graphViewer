@@ -172,12 +172,14 @@
 		triangle.setAttribute('d', 'M0,0 L0,3 L3,1.5 Z' );
 		marker.appendChild(triangle);
 		defs.appendChild(marker);
-
+		var gBox = document.createElementNS("http://www.w3.org/2000/svg", "g");
 		var g2 = document.createElementNS("http://www.w3.org/2000/svg", "g");
 		var g1 = document.createElementNS("http://www.w3.org/2000/svg", "g");
 		svg.appendChild(defs);
-		svg.appendChild(g2);
-		svg.appendChild(g1);
+		svg.appendChild(gBox);
+		gBox.appendChild(g2);
+		gBox.appendChild(g1);
+		this.gBox = gBox;
 		this.defs = defs;
 		this.g2 = g2;
 		this.g1 = g1;
