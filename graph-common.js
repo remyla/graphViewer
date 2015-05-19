@@ -19,6 +19,10 @@
 		this.refreshDebugFrame();
 	}
 
+	damasGraph.prototype.unselectToggleD3 = function() {
+		d3.selectAll('.selected').classed('selected', false);
+	}
+
 	damasGraph.prototype.selectToggle = function( node ) {
 		if (this.selection.indexOf(node) === -1 )
 		{
