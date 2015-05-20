@@ -33,6 +33,7 @@
 			this.selection.pop( node );
 		}
 		node.shape.classList.toggle('selected');
+		this.refreshDebugFrame();
 	}
 
 	damasGraph.prototype.load = function( json ){
@@ -83,8 +84,6 @@
 	{
 		this.selection.pop(node);
 		this.nodes.pop(node);
-		node.shape.parentNode.removeChild(node.shape);
-		this.springy_graph.removeNode( node );
 		return true;
 	}
 
@@ -93,10 +92,11 @@
 		this.debug = {};
 		var div = document.createElement("div");
 		div.setAttribute('id', 'graphDebugFrame' );
-		var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> node(s)<br/><span id="graphDebugNbEdges">?</span> edge(s)<br/>';
+		var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> node(s)<br/><span id="graphDebugNbEdges">?</span> edge(s)<br/><span id="graphDebugNbSelection">?</span> selected<br/>';
 		div.innerHTML = c;
 		this.debug.nbNodes = div.querySelector('#graphDebugNbNodes');
 		this.debug.nbEdges = div.querySelector('#graphDebugNbEdges');
+		this.debug.nbSelection = div.querySelector('#graphDebugNbSelection');
 		htmlelem.appendChild(div);
 	}
 
@@ -109,6 +109,10 @@
 		if(this.debug.nbEdges)
 		{
 			this.debug.nbEdges.innerHTML = this.links.length;
+		}
+		if(this.debug.nbSelection)
+		{
+			this.debug.nbSelection.innerHTML = this.selection.length;
 		}
 	}
 
@@ -190,103 +194,5 @@
 		return svg;
 	}
 
-damassvggraph = {
-	makeSVGinteractive: function() {
-		// TEST FOR DROP
-		/*
-		allowDrop = function(ev){
-			ev.preventDefault();
-			return false;
-		}
-		drop = function(ev){
-			alert('drop');
-			ev.preventDefault();
-			//console.log(ev.dataTransfer);
-			//console.log(ev.dataTransfer.files[0]);
-			console.log(ev.dataTransfer.files);
-			var files = ev.dataTransfer.files;
-			//alert(files.length);
-			for(i=0;i<files.length;i++)
-			{
-				var file = files[i];
-				var elem = damas.create(file);
-				elem.update({label: file.name });
-				nodes[elem.id] = graph.newNode({'label': file.name});
-				nodes[elem.id].damelem = elem;
-				//console.log(ev.dataTransfer);
-			}
-		}
-		svg.setAttribute('ondragover', 'allowDrop(event)');
-		svg.setAttribute('ondrop', 'drop(event)');
-		*/
-
-		function cancel(e){
-			e.stopPropagation();
-			if(e.preventDefault) e.preventDefault();
-			e.dataTransfer.dropEffect = 'copy';
-			return false; // required by IE
-		}
-		svg.ondragover = cancel;
-		svg.ondragenter = cancel;
-/*
-		svg.ondragover = function(e){
-			e.stopPropagation();
-			e.preventDefault();
-		}
-*/
-		svg.ondragleave = function(e){
-			e.stopPropagation();
-			e.preventDefault();
-		}
-		svg.ondrop = function(e){
-			//alert( e.dataTransfer.getData('Text'));
-			e.stopPropagation();
-			if(e.preventDefault) e.preventDefault();
-			//alert('ondrop');
-			console.log(e.dataTransfer);
-			console.log(e.dataTransfer.files);
-			var files = e.dataTransfer.files;
-
-			// DROP FILES
-			for(i=0;i<files.length;i++)
-			{
-				var file = files[i];
-				var elem = damas.create(file);
-				elem.update({label: file.name });
-				nodes[elem.id] = graph.newNode({'label': file.name});
-				nodes[elem.id].damelem = elem;
-				//console.log(ev.dataTransfer);
-			}
-			console.log(e.dataTransfer.types);
-			var types = e.dataTransfer.types;
-			if(e.dataTransfer.types)
-			{
-				// DROP EXISTING NODE
-				var text = e.dataTransfer.getData('Text');
-				if( text.indexOf(window.location.origin) === 0)
-				{
-					id = text.replace(window.location.origin+window.location.pathname+'#view=', '');
-					var elem = damas.read(parseInt(id));
-					Object.extend( elem, damas.element_canvas );
-					var img = elem.imageURL();
-					nodes[elem.id] = graph.newNode( { 'elem':elem, 'label': elem.label(), 'damid': elem.id, 'damimg': img } );
-					nodes[elem.id].damelem = elem;
-				}
-				// DROP LINK
-				else
-				{
-					var elem = damas.create( {
-						url: e.dataTransfer.getData('Text')
-					});
-					nodes[elem.id] = graph.newNode({'label': e.dataTransfer.getData('Text')});
-					nodes[elem.id].damelem = elem;
-				}
-			}
-		}
-		// TEST END
-	}
-}
-
 	return damasGraph;
-
 }));
