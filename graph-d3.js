@@ -120,15 +120,22 @@
 		return false;
 	}
 
-	damasGraph.prototype.newEdge = function ( link )
+	damasGraph.prototype.newEdgeD3 = function ( link )
 	{
+		var id_link;
+			if("link_id" in link)
+				id_link = link.link_id;
+			else if("_id" in link)
+				id_link =link._id;
+
 		for( l in this.force.links )
 		{
-			if (l.id === link._id) return false;
+			if (l.id === id_link)
+				return false;
 		}
 		//if (this.force.links[node.id]) return false;
 		this.links.push({
-			id: link._id,
+			id: id_link,
 			source: this.node_lut[link.src_id],
 			target: this.node_lut[link.tgt_id]
 		});
@@ -168,7 +175,7 @@
 		
 		g.append("circle")
 			.attr("r", 10)
-			.attr("class", "nodeBG");
+			.attr("class", function(d){ d.shape = d3.select(this)[0][0]; return "nodeBG"});
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)
@@ -214,14 +221,12 @@
 
 		g.on("click", function(d) {
 			if (d3.event.defaultPrevented) return; // click suppressed
-			assetOverlay(d);
+			//assetOverlay(d);
+			if(window['node_pressed']){
+				node_pressed.call(d, d3.event);
+			}
 		});
 		
-//		g.on( 'click', function(d){
-//			if(window['node_pressed']){
-//				node_pressed.call(this, d);
-//			}
-//		});
 
 		var patImage = this.defs.selectAll("pattern")
 			.data(this.nodes)
