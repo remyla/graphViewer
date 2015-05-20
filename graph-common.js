@@ -19,20 +19,26 @@
 		this.refreshDebugFrame();
 	}
 
-	damasGraph.prototype.unselectToggleD3 = function() {
-		d3.selectAll('.selected').classed('selected', false);
-	}
-
 	damasGraph.prototype.selectToggle = function( node ) {
-		if (this.selection.indexOf(node) === -1 )
+		if(node)
 		{
-			this.selection.push( node );
+			if (this.selection.indexOf(node) === -1 )
+			{
+				this.selection.push( node );
+			}
+			else
+			{
+				this.selection.pop( node );
+			}
+			node.shape.classList.toggle('selected');
 		}
 		else
 		{
-			this.selection.pop( node );
+			this.selection.forEach(function(node_in_selection){
+				node_in_selection.shape.classList.toggle('selected');
+			});
+			this.selection.length = 0;
 		}
-		node.shape.classList.toggle('selected');
 		this.refreshDebugFrame();
 	}
 
