@@ -206,15 +206,10 @@
 			if (d3.event.defaultPrevented) return; // click suppressed
 			//assetOverlay(d);
 			if(window['node_pressed']){
-							node_pressed.call(d, d3.event);
-						}
+				node_pressed.call(d, d3.event);
+			}
 		});
 		
-//		g.on( 'click', function(d){
-//			if(window['node_pressed']){
-//				node_pressed.call(this, d);
-//			}
-//		});
 
 		var patImage = this.defs.selectAll("pattern")
 			.data(this.nodes)
