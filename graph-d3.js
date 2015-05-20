@@ -139,12 +139,29 @@
 
 	damasGraph.prototype.restart = function ()
 	{
+//		function cloneObject(obj) {
+//			if (obj === null || typeof obj !== 'object') {
+//				return obj;
+//			}
+//			var temp = obj.constructor(); // give temp the original obj's constructor
+//			for (var key in obj) {
+//				temp[key] = cloneObject(obj[key]);
+//			}
+//			return temp;
+//		}
+//		var toto = cloneObject(this.nodes);
+//		var toto = JSON.stringify(this.nodes[0]);
+//		alert(toto);
 		this.force.links(this.links);
+//		this.force.nodes(JSON.parse(JSON.stringify(this.nodes)));
 		this.force.nodes(this.nodes);
+
 		// add new nodes
 		this.svgNodes = this.svgNodes.data( this.nodes, function(d){
 			return (d.id)? d.id : d._id;
 		});
+		this.svgLinks = this.svgLinks.data( this.links, function(l){ return l._id });
+		
 		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
 				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
 				.on("drag", function(d) { graph.drag(); }));
@@ -290,7 +307,7 @@
 		//g.call(this.force.drag);
 
 		// add new links
-		this.svgLinks = this.svgLinks.data(this.links);
+//		this.svgLinks = this.svgLinks.data(this.links);
 //		this.svgLinks = this.svgLinks.data( this.links, function(l){ return l.id });
 		var lin = this.svgLinks.enter().append("svg:path")
 			.attr("class", "link")
@@ -299,7 +316,7 @@
 		
 		lin.on("click", function(l) {
 			if (d3.event.defaultPrevented) return; // click suppressed
-			test(l);
+			assetOverlay(l);
 		});
 		
 
