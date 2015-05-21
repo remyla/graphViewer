@@ -41,8 +41,10 @@
 			.size([width, height])
 			.nodes([])
 			.links([]);
-		this.nodes = [];
-		this.links = [];
+
+		this.d3_nodes = [];
+		this.d3_links = [];
+
 
 		this.drag = function()
 		{	d3.behavior.drag()
@@ -114,42 +116,44 @@
 	{
 		if( this._newNode(node) )
 		{
+			this.d3_nodes.push(node);
 			this.restart();
 			return true;
 		}
 		return false;
 	}
 
-	damasGraph.prototype.newEdgeD3 = function ( link )
+	damasGraph.prototype.newEdge = function ( link )
 	{
-		var id_link;
-			if("link_id" in link)
-				id_link = link.link_id;
-			else if("_id" in link)
-				id_link =link._id;
-
-		for( l in this.force.links )
-		{
-			if (l.id === id_link)
-				return false;
+		function search_node(id){
+			for( var i=0; i< graph.d3_nodes.length; i++){
+				if (graph.d3_nodes[i]._id === id)
+					return graph.d3_nodes[i];
+			}
 		}
-		//if (this.force.links[node.id]) return false;
-		this.links.push({
-			id: id_link,
-			source: this.node_lut[link.src_id],
-			target: this.node_lut[link.tgt_id]
-		});
-		this.restart();
-		this.refreshDebugFrame();
-		return true;
+		if (this._newEdge(link))
+		{
+			this.d3_links.push({
+				source: search_node(link.src_id),
+				target: search_node(link.tgt_id)
+			});
+			this.restart();
+			return true;
+		}
+		return false;
+	}
+
+	damasGraph.prototype.getShape = function( node )
+	{
+		return node.shape;
 	}
 
 	damasGraph.prototype.restart = function ()
 	{
-		this.force.links(this.links);
-		this.force.nodes(this.nodes);
+		this.force.nodes(this.d3_nodes);
+		this.force.links(this.d3_links);
 		// add new nodes
-		this.svgNodes = this.svgNodes.data( this.nodes, function(d){
+		this.svgNodes = this.svgNodes.data( this.d3_nodes, function(d){
 			return (d.id)? d.id : d._id;
 		});
 		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
@@ -158,6 +162,7 @@
 		
 		g.append("circle")
 			.attr("r", 10)
+			//.attr("class", "nodeBG");
 			.attr("class", function(d){ d.shape = d3.select(this)[0][0]; return "nodeBG"});
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })
@@ -176,7 +181,7 @@
 			.attr("dx", 12)
 			.attr("dy", ".35em")
 			.text(function(d) {
-				return (d.keys)? d.keys.file.split('/').pop() : d.file.split('/').pop();
+				return (d.file)? d.file.split('/').pop() : d._id;
 			});
 //				.text(function(d) { return d.id });
 //				.style("stroke", "white");
@@ -210,7 +215,6 @@
 			}
 		});
 		
-
 		var patImage = this.defs.selectAll("pattern")
 			.data(this.nodes)
 			.enter().append('svg:pattern')
@@ -295,7 +299,7 @@
 		//g.call(this.force.drag);
 
 		// add new links
-		this.svgLinks = this.svgLinks.data(this.links);
+		this.svgLinks = this.svgLinks.data(this.d3_links);
 //		this.svgLinks = this.svgLinks.data( this.links, function(l){ return l.id });
 		var lin = this.svgLinks.enter().append("svg:path")
 			.attr("class", "link")

@@ -66,6 +66,10 @@
 		}
 	}
 
+	damasGraph.prototype.getShape = function( node ){
+		return this.springy_graph.nodes[this.springy_lut[node._id]].shape;
+	}
+
 	/**
 	 * Clear the graph
 	 */
@@ -241,7 +245,7 @@
 						if(window['node_pressed']){
 							node_pressed.call(this, e);
 						}
-					}.bind(node));
+					}.bind(graph.node_lut[node.data._id]));
 				}
 				var s = springy_damas.toScreen(p);
 				node.shape.setAttribute('cx', s.x );
