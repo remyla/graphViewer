@@ -120,7 +120,7 @@
 		return false;
 	}
 
-	damasGraph.prototype.newEdgeD3 = function ( link )
+	damasGraph.prototype.newEdge = function ( link )
 	{
 		var id_link;
 			if("link_id" in link)
@@ -167,7 +167,6 @@
 		this.svgNodes = this.svgNodes.data( this.nodes, function(d){
 			return (d.id)? d.id : d._id;
 		});
-		this.svgLinks = this.svgLinks.data( this.links, function(l){ return l._id });
 		
 		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
 				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
@@ -175,7 +174,8 @@
 		
 		g.append("circle")
 			.attr("r", 10)
-			.attr("class", function(d){ d.shape = d3.select(this)[0][0]; return "nodeBG"});
+			.attr("class", function(d){ d.shape = this; return "nodeBG"});
+		
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)
@@ -313,7 +313,7 @@
 
 		// add new links
 //		this.svgLinks = this.svgLinks.data(this.links);
-//		this.svgLinks = this.svgLinks.data( this.links, function(l){ return l.id });
+		this.svgLinks = this.svgLinks.data( this.links, function(l){ return l._id });
 		var lin = this.svgLinks.enter().append("svg:path")
 			.attr("class", "link")
 			.style("marker-end",  "url(#arrow)")
@@ -321,7 +321,10 @@
 		
 		lin.on("click", function(l) {
 			if (d3.event.defaultPrevented) return; // click suppressed
-			assetOverlay(l);
+			//assetOverlay(d);
+			if(window['node_pressed']){
+				node_pressed.call(l, d3.event);
+			}
 		});
 		
 
