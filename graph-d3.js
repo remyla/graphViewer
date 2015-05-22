@@ -41,8 +41,10 @@
 			.size([width, height])
 			.nodes([])
 			.links([]);
-		this.nodes = [];
-		this.links = [];
+
+		this.d3_nodes = [];
+		this.d3_links = [];
+
 
 		this.drag = function()
 		{	d3.behavior.drag()
@@ -114,6 +116,7 @@
 	{
 		if( this._newNode(node) )
 		{
+			this.d3_nodes.push(JSON.parse(JSON.stringify(node)));
 			this.restart();
 			return true;
 		}
@@ -122,49 +125,38 @@
 
 	damasGraph.prototype.newEdge = function ( link )
 	{
-		var id_link;
-			if("link_id" in link)
-				id_link = link.link_id;
-			else if("_id" in link)
-				id_link =link._id;
-
-		for( l in this.force.links )
-		{
-			if (l.id === id_link)
-				return false;
+		function search_node(id){
+			for( var i=0; i< graph.d3_nodes.length; i++){
+				if (graph.d3_nodes[i]._id === id)
+					return graph.d3_nodes[i];
+			}
 		}
-		//if (this.force.links[node.id]) return false;
-		this.links.push({
-			id: id_link,
-			source: this.node_lut[link.src_id],
-			target: this.node_lut[link.tgt_id]
-		});
-		this.restart();
-		this.refreshDebugFrame();
-		return true;
+		if (this._newEdge(link))
+		{
+			this.d3_links.push({
+				id: link._id,
+//				id: this.node_lut[link._id],
+				source: search_node(link.src_id),
+				target: search_node(link.tgt_id)
+			});
+			this.restart();
+			return true;
+		}
+		return false;
+	}
+
+	damasGraph.prototype.getShape = function( node )
+	{
+		return node.shape;
 	}
 
 	damasGraph.prototype.restart = function ()
 	{
-//		function cloneObject(obj) {
-//			if (obj === null || typeof obj !== 'object') {
-//				return obj;
-//			}
-//			var temp = obj.constructor(); // give temp the original obj's constructor
-//			for (var key in obj) {
-//				temp[key] = cloneObject(obj[key]);
-//			}
-//			return temp;
-//		}
-//		var toto = cloneObject(this.nodes);
-//		var toto = JSON.stringify(this.nodes[0]);
-//		alert(toto);
-		this.force.links(this.links);
-//		this.force.nodes(JSON.parse(JSON.stringify(this.nodes)));
-		this.force.nodes(this.nodes);
 
+		this.force.nodes(this.d3_nodes);
+		this.force.links(this.d3_links);
 		// add new nodes
-		this.svgNodes = this.svgNodes.data( this.nodes, function(d){
+		this.svgNodes = this.svgNodes.data( this.d3_nodes, function(d){
 			return (d.id)? d.id : d._id;
 		});
 		
@@ -175,7 +167,7 @@
 		g.append("circle")
 			.attr("r", 10)
 			.attr("class", function(d){ d.shape = this; return "nodeBG"});
-		
+
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)
@@ -193,7 +185,7 @@
 			.attr("dx", 12)
 			.attr("dy", ".35em")
 			.text(function(d) {
-				return (d.keys)? d.keys.file.split('/').pop() : d.file.split('/').pop();
+				return (d.file)? d.file.split('/').pop() : d._id;
 			});
 //				.text(function(d) { return d.id });
 //				.style("stroke", "white");
@@ -223,11 +215,10 @@
 			if (d3.event.defaultPrevented) return; // click suppressed
 			//assetOverlay(d);
 			if(window['node_pressed']){
-				node_pressed.call(d, d3.event);
+				node_pressed.call(graph.node_lut[d._id], d3.event);
 			}
 		});
 		
-
 		var patImage = this.defs.selectAll("pattern")
 			.data(this.nodes)
 			.enter().append('svg:pattern')
@@ -312,8 +303,9 @@
 		//g.call(this.force.drag);
 
 		// add new links
-//		this.svgLinks = this.svgLinks.data(this.links);
-		this.svgLinks = this.svgLinks.data( this.links, function(l){ return l._id });
+
+		this.svgLinks = this.svgLinks.data(this.d3_links);
+//		this.svgLinks = this.svgLinks.data( this.links, function(l){ return l.id });
 		var lin = this.svgLinks.enter().append("svg:path")
 			.attr("class", "link")
 			.style("marker-end",  "url(#arrow)")
@@ -323,7 +315,7 @@
 			if (d3.event.defaultPrevented) return; // click suppressed
 			//assetOverlay(d);
 			if(window['node_pressed']){
-				node_pressed.call(l, d3.event);
+//				node_pressed.call(graph.node_lut[l._id], d3.event); // TODO
 			}
 		});
 		

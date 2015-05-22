@@ -20,25 +20,23 @@
 	}
 
 	damasGraph.prototype.selectToggle = function( node ) {
-		if(node)
+		if (this.selection.indexOf(node) === -1 )
 		{
-			if (this.selection.indexOf(node) === -1 )
-			{
-				this.selection.push( node );
-			}
-			else
-			{
-				this.selection.pop( node );
-			}
-			node.shape.classList.toggle('selected');
+			this.selection.push( node );
 		}
 		else
 		{
-			this.selection.forEach(function(node_in_selection){
-				node_in_selection.shape.classList.toggle('selected');
-			});
-			this.selection.length = 0;
+			this.selection.pop( node );
 		}
+		this.getShape(node).classList.toggle('selected');
+		this.refreshDebugFrame();
+	}
+
+	damasGraph.prototype.unselectAll = function( ) {
+		this.selection.forEach(function(n){
+			this.getShape(n).classList.remove('selected');
+		});
+		this.selection.length = 0;
 		this.refreshDebugFrame();
 	}
 
@@ -71,7 +69,7 @@
 
 	damasGraph.prototype._newNode = function( node )
 	{
-                if(node.id && !node._id) node._id = node.id; // backward compatibility
+		if(node.id && !node._id) node._id = node.id; // backward compatibility
 		if (this.node_lut[node._id]) return false;
 		this.nodes.push(node);
 		this.node_lut[node._id] = node;
