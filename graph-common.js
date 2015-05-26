@@ -69,7 +69,7 @@
 
 	damasGraph.prototype._newNode = function( node )
 	{
-                if(node.id && !node._id) node._id = node.id; // backward compatibility
+		if(node.id && !node._id) node._id = node.id; // backward compatibility
 		if (this.node_lut[node._id]) return false;
 		this.nodes.push(node);
 		this.node_lut[node._id] = node;

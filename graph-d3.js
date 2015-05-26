@@ -116,7 +116,7 @@
 	{
 		if( this._newNode(node) )
 		{
-			this.d3_nodes.push(node);
+			this.d3_nodes.push(JSON.parse(JSON.stringify(node)));
 			this.restart();
 			return true;
 		}
@@ -134,6 +134,8 @@
 		if (this._newEdge(link))
 		{
 			this.d3_links.push({
+				id: link._id,
+//				id: this.node_lut[link._id],
 				source: search_node(link.src_id),
 				target: search_node(link.tgt_id)
 			});
@@ -150,20 +152,22 @@
 
 	damasGraph.prototype.restart = function ()
 	{
+
 		this.force.nodes(this.d3_nodes);
 		this.force.links(this.d3_links);
 		// add new nodes
 		this.svgNodes = this.svgNodes.data( this.d3_nodes, function(d){
 			return (d.id)? d.id : d._id;
 		});
+		
 		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
 				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
 				.on("drag", function(d) { graph.drag(); }));
 		
 		g.append("circle")
 			.attr("r", 10)
-			//.attr("class", "nodeBG");
-			.attr("class", function(d){ d.shape = d3.select(this)[0][0]; return "nodeBG"});
+			.attr("class", function(d){ d.shape = this; return "nodeBG"});
+
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)
@@ -211,7 +215,7 @@
 			if (d3.event.defaultPrevented) return; // click suppressed
 			//assetOverlay(d);
 			if(window['node_pressed']){
-				node_pressed.call(d, d3.event);
+				node_pressed.call(graph.node_lut[d._id], d3.event);
 			}
 		});
 		
@@ -299,6 +303,7 @@
 		//g.call(this.force.drag);
 
 		// add new links
+
 		this.svgLinks = this.svgLinks.data(this.d3_links);
 //		this.svgLinks = this.svgLinks.data( this.links, function(l){ return l.id });
 		var lin = this.svgLinks.enter().append("svg:path")
@@ -308,7 +313,10 @@
 		
 		lin.on("click", function(l) {
 			if (d3.event.defaultPrevented) return; // click suppressed
-			test(l);
+			//assetOverlay(d);
+			if(window['node_pressed']){
+//				node_pressed.call(graph.node_lut[l._id], d3.event); // TODO
+			}
 		});
 		
 
