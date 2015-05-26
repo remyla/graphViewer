@@ -96,11 +96,12 @@
 		this.debug = {};
 		var div = document.createElement("div");
 		div.setAttribute('id', 'graphDebugFrame' );
-		var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> node(s)<br/><span id="graphDebugNbEdges">?</span> edge(s)<br/><span id="graphDebugNbSelection">?</span> selected<br/>';
+		var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> node(s)<br/><span id="graphDebugNbEdges">?</span> edge(s)<br/><span id="graphDebugNbSelection">?</span> selected<br/><div id="graphDebugFileKeys"></div>';
 		div.innerHTML = c;
 		this.debug.nbNodes = div.querySelector('#graphDebugNbNodes');
 		this.debug.nbEdges = div.querySelector('#graphDebugNbEdges');
 		this.debug.nbSelection = div.querySelector('#graphDebugNbSelection');
+		this.debug.fileKeys = div.querySelector('#graphDebugFileKeys');
 		htmlelem.appendChild(div);
 	}
 
@@ -118,6 +119,15 @@
 		{
 			this.debug.nbSelection.innerHTML = this.selection.length;
 		}
+		if(this.debug.fileKeys)
+		{
+			var files = [];
+			for(var i=0;i<this.nodes.length;i++)
+			{
+				files.push(this.nodes[i].file);
+			}
+			this.debug.fileKeys.innerHTML = files.sort().join('<br/>');
+		}
 	}
 
 	damasGraph.prototype.init_SVG = function ( )
@@ -134,14 +144,14 @@
 		// marker 1
 		var marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
 		marker.setAttribute('id', 'arrow' );
-		marker.setAttribute('markerWidth', '3' );
-		marker.setAttribute('markerHeight', '3' );
-		marker.setAttribute('refX', '1.5' );
-		marker.setAttribute('refY', '1.5' );
+		marker.setAttribute('markerWidth', '6' );
+		marker.setAttribute('markerHeight', '6' );
+		marker.setAttribute('refX', '3' );
+		marker.setAttribute('refY', '3' );
 		marker.setAttribute('orient', 'auto' );
 		marker.setAttribute('markerUnits', 'strokeWidth' );
 		var triangle = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		triangle.setAttribute('d', 'M0,0 L0,3 L3,1.5 Z' );
+		triangle.setAttribute('d', 'M0,0 L0,6 L6,3 Z' );
 		marker.appendChild(triangle);
 		defs.appendChild(marker);
 		
