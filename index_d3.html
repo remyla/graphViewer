@@ -26,7 +26,7 @@
 			}
 			document.addEventListener('DOMContentLoaded', function() {
 				graph = new damasGraph( document.getElementById('graph'));
-                                fetchJSONFile('json/example.json', function(data){
+                                fetchJSONFile('json/bigbuckbunny_characters.json', function(data){
                                         graph.load(data);
                                 });
 			});

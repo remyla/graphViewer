@@ -27,7 +27,7 @@
 			document.addEventListener('DOMContentLoaded', function() {
 				graph = new damasGraph( document.getElementById('graph'));
 				graph.svg.style.height = window.innerHeight -4 + 'px';
-				fetchJSONFile('json/example.json', function(data){
+				fetchJSONFile('json/bigbuckbunny_characters.json', function(data){
 					graph.load(data);
 				});
 			});
