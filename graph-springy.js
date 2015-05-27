@@ -157,19 +157,23 @@
 				{
 					a = document.createElementNS("http://www.w3.org/2000/svg", 'a');
 					a.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#' + node.data._id );
-					//a.setAttributeNS('http://www.w3.org/1999/xlink', 'href', node.data.keys.file );
-					//a.setAttribute('title', escape(JSON.stringify(node.data)));
+					var circleBG = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+					circleBG.setAttribute('class','nodeBG');
+					circleBG.setAttribute('r',springy_damas.ray);
+					a.appendChild(circleBG);
+
 					var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-					//var txt = JSON.stringify(node.data);
 
 					node.text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 					node.text.setAttribute('style', 'font: 4px arial');
 					
-					node.shape = circle;
+					node.shape = a;
 					circle.node = node;
 					circle.point = p;
 					a.appendChild(circle);
 					circle.setAttribute('r',springy_damas.ray);
+					node.ext = graph.nodeText(node.data);
+					a.appendChild(node.ext);
 
 					var name = node.data.name;
 					if (name)
@@ -209,18 +213,14 @@
 						c.setAttribute('fill', 'none');
 						pattern.appendChild( c );
 						*/
-						circle.setAttribute('fill','url(#thumb'+node.data._id+')');
+//						circle.setAttribute('fill','url(#thumb'+node.data._id+')');
+						circle.style.fill = 'url(#thumb'+node.data._id+')';
 					}
 					
 					var file = node.data.file;
 					if (file)
 					{
-						if (!image){
-							circle.setAttribute('fill','#bebebe');
-							node.ext = extensionTxt(node.data);
-							a.appendChild(node.ext);
-						}
-							
+
 						var title = document.createElementNS("http://www.w3.org/2000/svg", 'title');
 						var titleText = document.createTextNode( file.split('/').reverse()[0]);
 						title.appendChild(titleText);
@@ -256,16 +256,9 @@
 					}.bind(graph.node_lut[node.data._id]));
 				}
 				var s = springy_damas.toScreen(p);
-				node.shape.setAttribute('cx', s.x );
-				node.shape.setAttribute('cy', s.y );
-//				node.plus.setAttribute('x', (s.x) + 5 );
-//				node.plus.setAttribute('y', (s.y) + 5 );
+				node.shape.setAttribute('transform', 'translate(' + s.x + ',' + s.y + ')');
 				node.text.setAttribute('x', (s.x) + 11 );
 				node.text.setAttribute('y', (s.y) + 1 );
-				if(node.ext){
-					node.ext.setAttribute('dx', (s.x) );
-					node.ext.setAttribute('dy', (s.y) + 2 );
-				}
 			}
 		);
 	}

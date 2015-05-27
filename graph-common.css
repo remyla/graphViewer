@@ -19,7 +19,11 @@ div#graphDebug {
 	stroke-width: 0.2;
 }
 
-circle {
+circle.nodeBG {
+	fill:#dddddd;
+}
+
+circle.node {
 	transition: opacity 100ms ease;
 /*
 	stroke: #364E64;
@@ -30,7 +34,7 @@ circle {
 
 .extText {
 	fill: black;
-	font: 5px arial;
+	font: 5px sans-serif;
 }
 
 .selected {

@@ -210,17 +210,7 @@
 		marker.appendChild(triangle);
 		defs.appendChild(marker);
 		
-		// extensions
-		extensionTxt = function(node){
-				var ext = document.createElementNS("http://www.w3.org/2000/svg", "text");
-				ext.setAttribute('class', 'extText');
-				ext.setAttribute('text-anchor', 'middle');
-				ext.setAttribute('dx', 0);
-				ext.setAttribute('dy', 2);
-				ext.textContent = node.file.split(".").pop().toUpperCase();
-				return ext;
-		}
-		
+
 		var gBox = document.createElementNS("http://www.w3.org/2000/svg", "g");
 		var g1 = document.createElementNS("http://www.w3.org/2000/svg", "g");
 		var g2 = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -237,6 +227,18 @@
 		this.g2 = g2;
 		this.g1 = g1;
 		return svg;
+	}
+	
+	damasGraph.prototype.nodeText = function(node){
+		var ext = document.createElementNS("http://www.w3.org/2000/svg", "text");
+		ext.setAttribute('class', 'extText');
+		ext.setAttribute('text-anchor', 'middle');
+		ext.setAttribute('dx', 0);
+		ext.setAttribute('dy', 2);
+		if (node.file && !node.image){
+			ext.textContent = node.file.split(".").pop().toUpperCase();
+		}
+		return ext;
 	}
 
 	return damasGraph;

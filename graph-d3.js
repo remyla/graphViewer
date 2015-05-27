@@ -151,12 +151,11 @@
 
 	damasGraph.prototype.restart = function ()
 	{
-
 		this.force.nodes(this.d3_nodes);
 		this.force.links(this.d3_links);
 		// add new nodes
 		this.svgNodes = this.svgNodes.data( this.d3_nodes, function(d){
-			return (d.id)? d.id : d._id;
+			return d._id;
 		});
 		
 		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
@@ -181,7 +180,7 @@
 //			.attr('y', '0');
 		this.svgLabels = d3.select(this.g3).selectAll('text');
 		this.svgLabels = this.svgLabels.data( this.d3_nodes, function(d){
-			return (d.id)? d.id : d._id;
+			return d._id;
 		});
 		this.svgLabels.enter().append('svg:text')
 			.attr("class", "label")
@@ -190,14 +189,14 @@
 			.text(function(d) {
 				return (d.file)? d.file.split('/').pop() : d._id;
 			});
-
+		
 		g.append(function(d){
-			return extensionTxt(d);
+			return graph.nodeText(d);
 		});
 
 		g.append("a")
 			.attr('xlink:href', function(d) {
-				return (d.id)? '#'+d.id : '#'+d._id;
+				return '#'+d._id;
 			});
 
 		g.on("click", function(d) {
@@ -213,7 +212,7 @@
 			.enter().append('svg:pattern')
 			.attr('patternContentUnits', 'objectBoundingBox')
 			.attr('id', function(d) {
-				return (d.id)? "thumbPat"+d.id : "thumbPat"+d._id;
+				return "thumbPat"+d._id;
 			})
 			.attr('x', '0')
 			.attr('y', '0')
@@ -302,8 +301,8 @@
 		lin.on("click", function(l) {
 			if (d3.event.defaultPrevented) return; // click suppressed
 			if(window['node_pressed']){
-				console.log(l);
-				console.log(graph.node_lut[l.id]);
+//				console.log(l);
+//				console.log(graph.node_lut[l.id]);
 				node_pressed.call(graph.node_lut[l.id], d3.event);
 			}
 		});
