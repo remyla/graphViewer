@@ -135,7 +135,6 @@
 		{
 			this.d3_links.push({
 				id: link._id,
-//				id: this.node_lut[link._id],
 				source: search_node(link.src_id),
 				target: search_node(link.tgt_id)
 			});
@@ -189,23 +188,27 @@
 			});
 //				.text(function(d) { return d.id });
 //				.style("stroke", "white");
-		g.append('svg:text')
-			.attr("class", "extText")
-			.attr('text-anchor', 'middle')
-			.attr("dx", 0)
-			.attr("dy", 2)
-			.text(function(d) {
-				if("file" in d  && !("image" in d))
-				{
-					return d.file.split(".").pop().toUpperCase();
-				}
-				else if("keys" in d)
-				{
-					if("file" in d.keys && !("image" in d.keys))
-					{
-						return d.keys.file.split(".").pop().toUpperCase();
-					}
-				}});
+			g.append(function(d){
+				return extensionTxt(d);
+			});
+
+//		g.append('svg:text')
+//			.attr("class", "extText")
+//			.attr('text-anchor', 'middle')
+//			.attr("dx", 0)
+//			.attr("dy", 2)
+//			.text(function(d) {
+//				if("file" in d  && !("image" in d))
+//				{
+//					return d.file.split(".").pop().toUpperCase();
+//				}
+//				else if("keys" in d)
+//				{
+//					if("file" in d.keys && !("image" in d.keys))
+//					{
+//						return d.keys.file.split(".").pop().toUpperCase();
+//					}
+//				}});
 		g.append("a")
 			.attr('xlink:href', function(d) {
 				return (d.id)? '#'+d.id : '#'+d._id;
@@ -305,7 +308,6 @@
 		// add new links
 
 		this.svgLinks = this.svgLinks.data(this.d3_links);
-//		this.svgLinks = this.svgLinks.data( this.links, function(l){ return l.id });
 		var lin = this.svgLinks.enter().append("svg:path")
 			.attr("class", "link")
 			.style("marker-end",  "url(#arrow)")
@@ -313,9 +315,10 @@
 		
 		lin.on("click", function(l) {
 			if (d3.event.defaultPrevented) return; // click suppressed
-			//assetOverlay(d);
 			if(window['node_pressed']){
-//				node_pressed.call(graph.node_lut[l._id], d3.event); // TODO
+				console.log(l);
+				console.log(graph.node_lut[l.id]);
+				node_pressed.call(graph.node_lut[l.id], d3.event);
 			}
 		});
 		

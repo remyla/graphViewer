@@ -38,6 +38,11 @@ circle {
 	cursor: pointer;
 }
 
+.extText {
+	fill: black;
+	font: 5px arial;
+}
+
 .selected {
 	stroke: red;
 	stroke-width: 1;

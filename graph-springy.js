@@ -164,22 +164,14 @@
 
 					node.text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 					node.text.setAttribute('style', 'font: 4px arial');
-					a.appendChild(node.text);
+					
+					node.shape = circle;
+					circle.node = node;
+					circle.point = p;
+					a.appendChild(circle);
+					circle.setAttribute('r',springy_damas.ray);
 
-					var file = (node.data.keys)? node.data.keys.file : node.data.file;
-
-					if (file)
-					{
-						var title = document.createElementNS("http://www.w3.org/2000/svg", 'title');
-						var titleText = document.createTextNode( file.split('/').reverse()[0]);
-						title.appendChild(titleText);
-						circle.appendChild(title);
-
-						var textNode = document.createTextNode( file.split('/').reverse()[0]);
-						node.text.appendChild(textNode);
-
-					}
-					var name = (node.data.keys)? node.data.keys.name : node.data.name;
+					var name = node.data.name;
 					if (name)
 					{
 						var title = document.createElementNS("http://www.w3.org/2000/svg", 'title');
@@ -187,12 +179,8 @@
 						title.appendChild(titleText);
 						circle.appendChild(title);
 					}
-					node.shape = circle;
-					circle.node = node;
-					circle.point = p;
-					a.appendChild(circle);
-					circle.setAttribute('r',springy_damas.ray);
-					var image = (node.data.keys)? node.data.keys.image : node.data.image;
+					
+					var image = node.data.image;
 					if (image)
 					{
 						pattern = document.createElementNS("http://www.w3.org/2000/svg", 'pattern');
@@ -223,7 +211,26 @@
 						*/
 						circle.setAttribute('fill','url(#thumb'+node.data._id+')');
 					}
-					var type = (node.data.keys)? node.data.keys.type : node.data.type;
+					
+					var file = node.data.file;
+					if (file)
+					{
+						if (!image){
+							circle.setAttribute('fill','#bebebe');
+							node.ext = extensionTxt(node.data);
+							a.appendChild(node.ext);
+						}
+							
+						var title = document.createElementNS("http://www.w3.org/2000/svg", 'title');
+						var titleText = document.createTextNode( file.split('/').reverse()[0]);
+						title.appendChild(titleText);
+						circle.appendChild(title);
+
+						var textNode = document.createTextNode( file.split('/').reverse()[0]);
+						node.text.appendChild(textNode);
+						
+					}
+					var type = node.data.type;
 					if(type)
 					{
 						circle.setAttribute('class', type);
@@ -232,13 +239,14 @@
 					{
 
 					}
-
-					node.plus = document.createElementNS("http://www.w3.org/2000/svg", 'image');
-					a.appendChild(node.plus);
-					node.plus.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'scripts/graphViewer/icons/plus25.svg' );
-					node.plus.setAttribute('width', 5);
-					node.plus.setAttribute('height', 5);
-
+					
+//					node.plus = document.createElementNS("http://www.w3.org/2000/svg", 'image');
+//					a.appendChild(node.plus);
+//					node.plus.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'scripts/graphViewer/icons/plus25.svg');
+//					node.plus.setAttribute('width', 5);
+//					node.plus.setAttribute('height', 5);
+					
+					graph.g3.appendChild(node.text);
 					graph.g2.appendChild(a);
 
 					circle.addEventListener( 'click', function(e){
@@ -250,10 +258,12 @@
 				var s = springy_damas.toScreen(p);
 				node.shape.setAttribute('cx', s.x );
 				node.shape.setAttribute('cy', s.y );
-				node.plus.setAttribute('x', (s.x) + 5 );
-				node.plus.setAttribute('y', (s.y) + 5 );
-				node.text.setAttribute('x', (s.x) + 10 );
-				node.text.setAttribute('y', (s.y) - 5 );
+//				node.plus.setAttribute('x', (s.x) + 5 );
+//				node.plus.setAttribute('y', (s.y) + 5 );
+				node.text.setAttribute('x', (s.x) + 12 );
+				node.text.setAttribute('y', (s.y) + 1 );
+				node.ext.setAttribute('dx', (s.x) );
+				node.ext.setAttribute('dy', (s.y) + 2 );
 			}
 		);
 	}
