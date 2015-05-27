@@ -14,7 +14,7 @@
 		this.links = [];
 		this.selection = [];
 		this.node_lut = {};
-		this.initDebugFrame(htmlelem);
+		this.initDebugFrame(document.querySelector('#graphDebug'));
 		this.init(htmlelem);
 		this.refreshDebugFrame();
 	}
@@ -67,6 +67,22 @@
 		return true;
 	}
 
+	damasGraph.prototype.fetchJSONFile = function(path, callback)
+	{
+		var httpRequest = new XMLHttpRequest();
+		httpRequest.onreadystatechange = function() {
+			if (httpRequest.readyState === 4)
+			{
+				//if (httpRequest.status === 200) {
+				var data = JSON.parse(httpRequest.responseText);
+				if (callback) callback(data);
+				//}
+			}
+		};
+		httpRequest.open('GET', path);
+		httpRequest.send();
+	}
+
 	damasGraph.prototype._newNode = function( node )
 	{
 		if(node.id && !node._id) node._id = node.id; // backward compatibility
@@ -94,15 +110,13 @@
 	damasGraph.prototype.initDebugFrame = function ( htmlelem )
 	{
 		this.debug = {};
-		var div = document.createElement("div");
-		div.setAttribute('id', 'graphDebugFrame' );
+		if(!htmlelem) return;
 		var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> node(s)<br/><span id="graphDebugNbEdges">?</span> edge(s)<br/><span id="graphDebugNbSelection">?</span> selected<br/><div id="graphDebugFileKeys"></div>';
-		div.innerHTML = c;
-		this.debug.nbNodes = div.querySelector('#graphDebugNbNodes');
-		this.debug.nbEdges = div.querySelector('#graphDebugNbEdges');
-		this.debug.nbSelection = div.querySelector('#graphDebugNbSelection');
-		this.debug.fileKeys = div.querySelector('#graphDebugFileKeys');
-		htmlelem.appendChild(div);
+		htmlelem.innerHTML = c;
+		this.debug.nbNodes = htmlelem.querySelector('#graphDebugNbNodes');
+		this.debug.nbEdges = htmlelem.querySelector('#graphDebugNbEdges');
+		this.debug.nbSelection = htmlelem.querySelector('#graphDebugNbSelection');
+		this.debug.fileKeys = htmlelem.querySelector('#graphDebugFileKeys');
 	}
 
 	damasGraph.prototype.refreshDebugFrame = function ( )
