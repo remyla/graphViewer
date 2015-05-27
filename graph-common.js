@@ -213,8 +213,11 @@
 
 		var gBox = document.createElementNS("http://www.w3.org/2000/svg", "g");
 		var g1 = document.createElementNS("http://www.w3.org/2000/svg", "g");
+		g1.setAttribute('class', 'nodes');
 		var g2 = document.createElementNS("http://www.w3.org/2000/svg", "g");
+		g2.setAttribute('class', 'edges');
 		var g3 = document.createElementNS("http://www.w3.org/2000/svg", "g");
+		g3.setAttribute('class', 'texts');
 		svg.appendChild(defs);
 		svg.appendChild(gBox);
 		
