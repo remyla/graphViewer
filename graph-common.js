@@ -14,7 +14,7 @@
 		this.links = [];
 		this.selection = [];
 		this.node_lut = {};
-		this.initDebugFrame(htmlelem);
+		this.initDebugFrame(document.querySelector('#graphDebug'));
 		this.init(htmlelem);
 		this.refreshDebugFrame();
 	}
@@ -67,6 +67,22 @@
 		return true;
 	}
 
+	damasGraph.prototype.fetchJSONFile = function(path, callback)
+	{
+		var httpRequest = new XMLHttpRequest();
+		httpRequest.onreadystatechange = function() {
+			if (httpRequest.readyState === 4)
+			{
+				//if (httpRequest.status === 200) {
+				var data = JSON.parse(httpRequest.responseText);
+				if (callback) callback(data);
+				//}
+			}
+		};
+		httpRequest.open('GET', path);
+		httpRequest.send();
+	}
+
 	damasGraph.prototype._newNode = function( node )
 	{
 		if(node.id && !node._id) node._id = node.id; // backward compatibility
@@ -95,14 +111,13 @@
 	damasGraph.prototype.initDebugFrame = function ( htmlelem )
 	{
 		this.debug = {};
-		var div = document.createElement("div");
-		div.setAttribute('id', 'graphDebugFrame' );
-		var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> node(s)<br/><span id="graphDebugNbEdges">?</span> edge(s)<br/><span id="graphDebugNbSelection">?</span> selected<br/>';
-		div.innerHTML = c;
-		this.debug.nbNodes = div.querySelector('#graphDebugNbNodes');
-		this.debug.nbEdges = div.querySelector('#graphDebugNbEdges');
-		this.debug.nbSelection = div.querySelector('#graphDebugNbSelection');
-		htmlelem.appendChild(div);
+		if(!htmlelem) return;
+		var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> node(s)<br/><span id="graphDebugNbEdges">?</span> edge(s)<br/><span id="graphDebugNbSelection">?</span> selected<br/><div id="graphDebugFileKeys"></div>';
+		htmlelem.innerHTML = c;
+		this.debug.nbNodes = htmlelem.querySelector('#graphDebugNbNodes');
+		this.debug.nbEdges = htmlelem.querySelector('#graphDebugNbEdges');
+		this.debug.nbSelection = htmlelem.querySelector('#graphDebugNbSelection');
+		this.debug.fileKeys = htmlelem.querySelector('#graphDebugFileKeys');
 	}
 
 	damasGraph.prototype.refreshDebugFrame = function ( )
@@ -118,6 +133,15 @@
 		if(this.debug.nbSelection)
 		{
 			this.debug.nbSelection.innerHTML = this.selection.length;
+		}
+		if(this.debug.fileKeys)
+		{
+			var files = [];
+			for(var i=0;i<this.nodes.length;i++)
+			{
+				files.push(this.nodes[i].file);
+			}
+			this.debug.fileKeys.innerHTML = files.sort().join('<br/>');
 		}
 	}
 
@@ -135,14 +159,14 @@
 		// marker 1
 		var marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
 		marker.setAttribute('id', 'arrow' );
-		marker.setAttribute('markerWidth', '3' );
-		marker.setAttribute('markerHeight', '3' );
-		marker.setAttribute('refX', '1.5' );
-		marker.setAttribute('refY', '1.5' );
+		marker.setAttribute('markerWidth', '6' );
+		marker.setAttribute('markerHeight', '6' );
+		marker.setAttribute('refX', '3' );
+		marker.setAttribute('refY', '3' );
 		marker.setAttribute('orient', 'auto' );
 		marker.setAttribute('markerUnits', 'strokeWidth' );
 		var triangle = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		triangle.setAttribute('d', 'M0,0 L0,3 L3,1.5 Z' );
+		triangle.setAttribute('d', 'M0,0 L0,6 L6,3 Z' );
 		marker.appendChild(triangle);
 		defs.appendChild(marker);
 		

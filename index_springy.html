@@ -1,38 +1,18 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 	<head>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+		<meta charset="UTF-8"/>
 		<link rel="stylesheet" type="text/css" href="graph-common.css"/>
 		<script src="vendor/springy.js"></script>
 		<script src="vendor/svg-pan-zoom.js"></script>
 		<script src="graph-common.js"></script>
 		<script src="graph-springy.js"></script>
-<!--
-		<script src="interactions.js"></script>
--->
 		<script type="text/javascript">//<![CDATA[ 
-			function fetchJSONFile(path, callback) {
-				var httpRequest = new XMLHttpRequest();
-				httpRequest.onreadystatechange = function() {
-					if (httpRequest.readyState === 4) {
-						//if (httpRequest.status === 200) {
-						var data = JSON.parse(httpRequest.responseText);
-						if (callback) callback(data);
-						//}
-					}
-				};
-				httpRequest.open('GET', path);
-				httpRequest.send();
-			}
 			document.addEventListener('DOMContentLoaded', function() {
 				graph = new damasGraph( document.getElementById('graph'));
-				graph.svg.style.height = window.innerHeight -4 + 'px';
-				fetchJSONFile('json/example.json', function(data){
+				graph.fetchJSONFile('json/bigbuckbunny_characters.json', function(data){
 					graph.load(data);
 				});
-			});
-			window.addEventListener("resize", function() {
-				graph.svg.style.height = window.innerHeight -4 + 'px';
 			});
 		//]]>
 		</script>
@@ -44,6 +24,7 @@
 	</head>
 	<body>
 		<div id="graph"></div>
+		<div id="graphDebug"></div>
 	</body>
 </html>
 
