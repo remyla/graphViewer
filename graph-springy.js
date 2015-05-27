@@ -262,8 +262,10 @@
 //				node.plus.setAttribute('y', (s.y) + 5 );
 				node.text.setAttribute('x', (s.x) + 11 );
 				node.text.setAttribute('y', (s.y) + 1 );
-				node.ext.setAttribute('dx', (s.x) );
-				node.ext.setAttribute('dy', (s.y) + 2 );
+				if(node.ext){
+					node.ext.setAttribute('dx', (s.x) );
+					node.ext.setAttribute('dy', (s.y) + 2 );
+				}
 			}
 		);
 	}
