@@ -171,7 +171,7 @@
 			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)
 			.attr("fill", function(d) {
-				return (d.id)? "url(#thumbPat"+d.id+")" : "url(#thumbPat"+d._id+")";
+				return "url(#thumbPat"+d._id+")";
 			})
 			.attr("class", "node");
 //		g.append('svg:image')
@@ -179,36 +179,22 @@
 //			.attr('xlink:href', function(d) {return  thumbnail(d);})
 //			.attr('x', '0')
 //			.attr('y', '0');
-		g.append('svg:text')
+		this.svgLabels = d3.select(this.g3).selectAll('text');
+		this.svgLabels = this.svgLabels.data( this.d3_nodes, function(d){
+			return (d.id)? d.id : d._id;
+		});
+		this.svgLabels.enter().append('svg:text')
 			.attr("class", "label")
 			.attr("dx", 12)
 			.attr("dy", ".35em")
 			.text(function(d) {
 				return (d.file)? d.file.split('/').pop() : d._id;
 			});
-//				.text(function(d) { return d.id });
-//				.style("stroke", "white");
-			g.append(function(d){
-				return extensionTxt(d);
-			});
 
-//		g.append('svg:text')
-//			.attr("class", "extText")
-//			.attr('text-anchor', 'middle')
-//			.attr("dx", 0)
-//			.attr("dy", 2)
-//			.text(function(d) {
-//				if("file" in d  && !("image" in d))
-//				{
-//					return d.file.split(".").pop().toUpperCase();
-//				}
-//				else if("keys" in d)
-//				{
-//					if("file" in d.keys && !("image" in d.keys))
-//					{
-//						return d.keys.file.split(".").pop().toUpperCase();
-//					}
-//				}});
+		g.append(function(d){
+			return extensionTxt(d);
+		});
+
 		g.append("a")
 			.attr('xlink:href', function(d) {
 				return (d.id)? '#'+d.id : '#'+d._id;
@@ -237,7 +223,7 @@
 		var image = patImage.append('image')
 			.attr('id','thumbnail')
 			.attr('xlink:href', function(d) {
-				return (d.keys)? d.keys.image : d.image;
+				return d.image;
 			})
 			.attr('x', '0')
 			.attr('y', '0')
@@ -342,6 +328,9 @@
 		    return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
 		});
 		graph.svgNodes.attr('transform', function(d) {
+			return 'translate(' + d.x + ',' + d.y + ')';
+		});
+		graph.svgLabels.attr('transform', function(d) {
 			return 'translate(' + d.x + ',' + d.y + ')';
 		});
 /*

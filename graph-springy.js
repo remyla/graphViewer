@@ -10,8 +10,8 @@
 
 
 	springy_damas = {
-		ray: 12,
-		edge_distance: 12,
+		ray: 10,
+		edge_distance: 10,
 		graph_all_nodes : []
 	};
 
@@ -260,7 +260,7 @@
 				node.shape.setAttribute('cy', s.y );
 //				node.plus.setAttribute('x', (s.x) + 5 );
 //				node.plus.setAttribute('y', (s.y) + 5 );
-				node.text.setAttribute('x', (s.x) + 12 );
+				node.text.setAttribute('x', (s.x) + 11 );
 				node.text.setAttribute('y', (s.y) + 1 );
 				node.ext.setAttribute('dx', (s.x) );
 				node.ext.setAttribute('dy', (s.y) + 2 );
