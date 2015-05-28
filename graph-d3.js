@@ -134,7 +134,7 @@
 		if (this._newEdge(link))
 		{
 			this.d3_links.push({
-				id: link._id,
+				_id: link._id,
 				source: search_node(link.src_id),
 				target: search_node(link.tgt_id)
 			});
@@ -146,13 +146,69 @@
 
 	damasGraph.prototype.getShape = function( node )
 	{
-		return node.shape;
+		var _id = node._id;
+		var type, shape;
+		(node.src_id && node.tgt_id) ? type = this.d3_links : type = this.d3_nodes;
+		for(var x = 0; x < type.length; x++)
+		{
+			if(type[x]._id == _id)
+				shape = type[x].shape;
+		}
+		return shape;
+	}
+
+	damasGraph.prototype.removeNode = function( node ){ 
+		var shape = this.getShape(node);
+		var remove , pos;
+		
+		(node.src_id && node.tgt_id) ? remove = this.d3_links : remove = this.d3_nodes ;
+		
+		for(var x= 0; x < remove.length; x++)
+		{
+			if(remove[x]._id == node._id){
+				pos = x;
+			}
+		}
+		this._removeNode(node);
+		
+		delete this.node_lut[node._id];
+		remove.splice(pos, 1);
+		this.restart();
+		return true;
 	}
 
 	damasGraph.prototype.restart = function ()
 	{
 		this.force.nodes(this.d3_nodes);
 		this.force.links(this.d3_links);
+
+		// add data links
+		this.svgLinks = this.svgLinks.data(this.d3_links);
+
+		// update existing links
+		this.svgLinks.classed('selected' , function(d){ d.shape = this; return false; });
+
+		// add new links
+		this.svgLinks.enter().append("svg:path")
+			.attr("class", function(d){ d.shape = this; return "link" })
+			.style("marker-end",  "url(#arrow)")
+			.style("stroke-width", '1')
+			.on("mousedown", function(d, l) {
+				if (d3.event.defaultPrevented) return; // click suppressed
+				if(!d3.event.shiftKey) return;
+				//assetOverlay(d);
+				if(window['node_pressed']){
+					node_pressed.call(graph.node_lut[d._id], d3.event);
+				}
+			})
+			.on('mouseover', function(d){ 
+				d3.select(this).style('cursor', 'alias');
+			})
+		;
+
+		//for delete elements in the DOM if they are more elements DOM than number links-data
+		this.svgLinks.exit().remove(); 
+
 		// add new nodes
 		this.svgNodes = this.svgNodes.data( this.d3_nodes, function(d){
 			return d._id;
@@ -285,28 +341,8 @@
 			nodeSelection.select('g').style({opacity:'0.0'});
 		});
 
-		//damasGraph.svgNodes.append("title")
-			//.text(function(d) { return d.type; });
-
-		//g.call(this.force.drag);
-
-		// add new links
-
-		this.svgLinks = this.svgLinks.data(this.d3_links);
-		var lin = this.svgLinks.enter().append("svg:path")
-			.attr("class", "link")
-			.style("marker-end",  "url(#arrow)")
-			.style("stroke-width", '1');
-		
-		lin.on("click", function(l) {
-			if (d3.event.defaultPrevented) return; // click suppressed
-			if(window['node_pressed']){
-//				console.log(l);
-//				console.log(graph.node_lut[l.id]);
-				node_pressed.call(graph.node_lut[l.id], d3.event);
-			}
-		});
-		
+		//for delete elements in the DOM if they are more elements DOM than number nodes-data
+		this.svgNodes.exit().remove(); 
 
 		this.force.start();
 	}

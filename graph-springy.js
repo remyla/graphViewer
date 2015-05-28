@@ -38,7 +38,7 @@
 		{
 			var springy_node = this.springy_graph.newNode(node);
 			if(node.id && !node._id) node._id = node.id; // backward compatibility
-			this.springy_lut[node._id] = springy_node.id;
+			this.springy_lut[node._id] = springy_node;
 			return true;
 		}
 		return false;
@@ -47,11 +47,12 @@
 	damasGraph.prototype.newEdge = function( l ){
 		if (this._newEdge(l))
 		{
-			var springy_source_id = this.springy_lut[l['src_id']];
-			var springy_target_id = this.springy_lut[l['tgt_id']];
+			var springy_source_id = this.springy_lut[l['src_id']].id;
+			var springy_target_id = this.springy_lut[l['tgt_id']].id;
 			var springy_source_node = this.springy_graph.nodes[springy_source_id];
 			var springy_target_node = this.springy_graph.nodes[springy_target_id];
-			this.springy_graph.newEdge(springy_source_node, springy_target_node);
+			var springy_edge = this.springy_graph.newEdge(springy_source_node, springy_target_node, l);
+			this.springy_lut[l._id] = springy_edge;
 			return true;
 		}
 		return false;
@@ -59,15 +60,29 @@
 
 	damasGraph.prototype.removeNode = function( node ){
 
-		if (this.removeNode(node))
+		if (this._removeNode(node))
 		{
-			node.shape.parentNode.removeChild(node.shape);
-			this.springy_graph.removeNode( node );
+			var dataNode = this.springy_lut[node._id];
+			var shape = dataNode.shape;
+			shape.parentNode.removeChild(shape);
+			var spr_graph = this.springy_graph;
+			(dataNode.source && dataNode.target) ? spr_graph.removeEdge( dataNode ) : spr_graph.removeNode( node );
 		}
 	}
 
 	damasGraph.prototype.getShape = function( node ){
-		return this.springy_graph.nodes[this.springy_lut[node._id]].shape;
+		var dataNode = this.springy_lut[node._id];
+		var search;
+		var figure;
+
+		(dataNode.source && dataNode.target) ? search = this.springy_graph.edges :  search = this.springy_graph.nodes;
+
+		for(var x=0; x < search.length; x++)
+		{
+			if(search[x].id == dataNode.id)
+				figure = search[x].shape;
+		}
+		return figure; //shape
 	}
 
 	/**
@@ -112,6 +127,11 @@
 					{
 						edge.shape.setAttribute('marker-end', 'url(#arrow)' );
 					}
+					edge.shape.addEventListener( 'click', function(e){
+  						if(window['node_pressed']){
+	  						node_pressed.call(this, e);
+   						}
+    				}.bind(graph.node_lut[edge.data._id]));
 				}
 				var s1 = springy_damas.toScreen(p1);
 				var s2 = springy_damas.toScreen(p2);
