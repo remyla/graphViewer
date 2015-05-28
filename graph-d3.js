@@ -161,20 +161,44 @@
 		var shape = this.getShape(node);
 		var remove , pos;
 		
-		(node.src_id && node.tgt_id) ? remove = this.d3_links : remove = this.d3_nodes ;
-		
-		for(var x= 0; x < remove.length; x++)
+		if(node.src_id && node.tgt_id)
 		{
-			if(remove[x]._id == node._id){
-				pos = x;
-			}
+			remove = this.d3_links;
+			pos = search(remove);
+			remove.splice(pos, 1);
 		}
+		else
+		{
+			remove = this.d3_nodes ;
+			pos = search(remove);
+			remove.splice(pos, 1);
+			spliceLinksForNode(node);
+		}
+		
 		this._removeNode(node);
 		
-		delete this.node_lut[node._id];
-		remove.splice(pos, 1);
 		this.restart();
 		return true;
+
+		function search(remove){
+			for(var x= 0; x < remove.length; x++)
+			{
+				if(remove[x]._id == node._id){
+					return x;
+				}
+			}
+		}
+		
+		function spliceLinksForNode(node) {
+			var links = graph.links;
+			var toSplice = graph.d3_links.filter(function(l) { 
+				return (l.source._id === node._id || l.target._id === node._id);
+			});
+			toSplice.map(function(l) {
+				graph.d3_links.splice(graph.d3_links.indexOf(l), 1);
+				graph.links.splice(graph.links.indexOf(l), 1) 
+			});
+		}
 	}
 
 	damasGraph.prototype.restart = function ()
@@ -193,16 +217,12 @@
 			.attr("class", function(d){ d.shape = this; return "link" })
 			.style("marker-end",  "url(#arrow)")
 			.style("stroke-width", '1')
-			.on("mousedown", function(d, l) {
+			.on("click", function(d, l) {
 				if (d3.event.defaultPrevented) return; // click suppressed
-				if(!d3.event.shiftKey) return;
 				//assetOverlay(d);
 				if(window['node_pressed']){
 					node_pressed.call(graph.node_lut[d._id], d3.event);
 				}
-			})
-			.on('mouseover', function(d){ 
-				d3.select(this).style('cursor', 'alias');
 			})
 		;
 
@@ -245,6 +265,9 @@
 			.text(function(d) {
 				return (d.file)? d.file.split('/').pop() : d._id;
 			});
+
+		//for delete elements in the DOM if they are more elements DOM than number svgLabels-data
+		this.svgLabels.exit().remove(); 
 		
 		g.append(function(d){
 			return graph.nodeText(d);
