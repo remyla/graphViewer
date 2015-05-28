@@ -161,20 +161,45 @@
 		var shape = this.getShape(node);
 		var remove , pos;
 		
-		(node.src_id && node.tgt_id) ? remove = this.d3_links : remove = this.d3_nodes ;
-		
-		for(var x= 0; x < remove.length; x++)
+		if(node.src_id && node.tgt_id)
 		{
-			if(remove[x]._id == node._id){
-				pos = x;
-			}
+			remove = this.d3_links;
+			pos = search(remove);
+			remove.splice(pos, 1);
 		}
+		else
+		{
+			remove = this.d3_nodes ;
+			pos = search(remove);
+			remove.splice(pos, 1);
+			spliceLinksForNode(node);
+		}
+		
 		this._removeNode(node);
 		
-		delete this.node_lut[node._id];
-		remove.splice(pos, 1);
 		this.restart();
 		return true;
+
+		function search(remove){
+			for(var x= 0; x < remove.length; x++)
+			{
+				if(remove[x]._id == node._id){
+					return x;
+				}
+			}
+		}
+		
+		function spliceLinksForNode(node) {
+			var links = graph.links;
+			var pos;
+			var toSplice = graph.d3_links.filter(function(l) { console.log(l);
+				return (l.source._id === node._id || l.target._id === node._id);
+			});
+			toSplice.map(function(l) {
+				graph.d3_links.splice(graph.d3_links.indexOf(l), 1);
+				graph.links.splice(graph.links.indexOf(l), 1) 
+			});
+		}
 	}
 
 	damasGraph.prototype.restart = function ()
@@ -193,16 +218,13 @@
 			.attr("class", function(d){ d.shape = this; return "link" })
 			.style("marker-end",  "url(#arrow)")
 			.style("stroke-width", '1')
-			.on("mousedown", function(d, l) {
+			.on("click", function(d, l) {
 				if (d3.event.defaultPrevented) return; // click suppressed
 				if(!d3.event.shiftKey) return;
 				//assetOverlay(d);
 				if(window['node_pressed']){
 					node_pressed.call(graph.node_lut[d._id], d3.event);
 				}
-			})
-			.on('mouseover', function(d){ 
-				d3.select(this).style('cursor', 'alias');
 			})
 		;
 
@@ -214,15 +236,15 @@
 			return d._id;
 		});
 		
-		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
+		this.svgNodes.enter().append('svg:g').call(graph.force.drag()
 				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
 				.on("drag", function(d) { graph.drag(); }));
 		
-		g.append("circle")
+		this.svgNodes.append("circle")
 			.attr("r", 10)
 			.attr("class", function(d){ d.shape = this; return "nodeBG"});
 
-		g.append('svg:circle')
+		this.svgNodes.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)
 			.attr("fill", function(d) {
@@ -245,17 +267,20 @@
 			.text(function(d) {
 				return (d.file)? d.file.split('/').pop() : d._id;
 			});
+
+		//for delete elements in the DOM if they are more elements DOM than number svgLabels-data
+		this.svgLabels.exit().remove(); 
 		
-		g.append(function(d){
+		this.svgNodes.append(function(d){
 			return graph.nodeText(d);
 		});
 
-		g.append("a")
+		this.svgNodes.append("a")
 			.attr('xlink:href', function(d) {
 				return '#'+d._id;
 			});
 
-		g.on("click", function(d) {
+		this.svgNodes.on("click", function(d) {
 			if (d3.event.defaultPrevented) return; // click suppressed
 			//assetOverlay(d);
 			if(window['node_pressed']){
@@ -290,7 +315,7 @@
 //				return  thumbnail(d);
 //			});
 		
-		var tools = g.append('svg:g')
+		var tools = this.svgNodes.append('svg:g')
 			.attr("class", "tools")
 			.style('opacity', '0');
 		
@@ -332,11 +357,11 @@
 			.attr('width', 4)
 			.attr('height', 4);
 
-		g.on("mouseover", function(d) {
+		this.svgNodes.on("mouseover", function(d) {
 			var nodeSelection = d3.select(this);
 			nodeSelection.select('g').style({opacity:'1.0'});
 		});
-		g.on("mouseout", function(d) {
+		this.svgNodes.on("mouseout", function(d) {
 			var nodeSelection = d3.select(this);
 			nodeSelection.select('g').style({opacity:'0.0'});
 		});
