@@ -225,7 +225,7 @@
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)
-			.attr("fill", function(d) {
+			.style("fill", function(d) {
 				return "url(#thumbPat"+d._id+")";
 			})
 			.attr("class", "node");
