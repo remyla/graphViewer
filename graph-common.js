@@ -20,14 +20,13 @@
 	}
 
 	damasGraph.prototype.selectToggle = function( node ) {
-		var position = this.selection.indexOf(node);
-		if (position === -1 )
+		if (this.selection.indexOf(node) === -1 )
 		{
 			this.selection.push( node );
 		}
 		else
 		{
-			this.selection.splice( position, 1 );
+			this.selection.pop( node );
 		}
 		this.getShape(node).classList.toggle('selected');
 		this.refreshDebugFrame();
@@ -106,7 +105,6 @@
 	{
 		this.selection.splice(this.selection.indexOf(node), 1);
 		(node.src_id && node.tgt_id) ? this.links.splice(this.links.indexOf(node), 1) : this.nodes.splice(this.nodes.indexOf(node), 1)
-		delete this.node_lut[node._id];
 		return true;
 	}
 

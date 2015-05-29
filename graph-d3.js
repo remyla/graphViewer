@@ -161,45 +161,20 @@
 		var shape = this.getShape(node);
 		var remove , pos;
 		
-		if(node.src_id && node.tgt_id)
-		{
-			remove = this.d3_links;
-			pos = search(remove);
-			remove.splice(pos, 1);
-		}
-		else
-		{
-			remove = this.d3_nodes ;
-			pos = search(remove);
-			remove.splice(pos, 1);
-			spliceLinksForNode(node);
-		}
+		(node.src_id && node.tgt_id) ? remove = this.d3_links : remove = this.d3_nodes ;
 		
-		this._removeNode(node);
-		
-		this.restart();
-		return true;
-
-		function search(remove){
-			for(var x= 0; x < remove.length; x++)
-			{
-				if(remove[x]._id == node._id){
-					return x;
-				}
+		for(var x= 0; x < remove.length; x++)
+		{
+			if(remove[x]._id == node._id){
+				pos = x;
 			}
 		}
+		this._removeNode(node);
 		
-		function spliceLinksForNode(node) {
-			var links = graph.links;
-			var pos;
-			var toSplice = graph.d3_links.filter(function(l) { console.log(l);
-				return (l.source._id === node._id || l.target._id === node._id);
-			});
-			toSplice.map(function(l) {
-				graph.d3_links.splice(graph.d3_links.indexOf(l), 1);
-				graph.links.splice(graph.links.indexOf(l), 1) 
-			});
-		}
+		delete this.node_lut[node._id];
+		remove.splice(pos, 1);
+		this.restart();
+		return true;
 	}
 
 	damasGraph.prototype.restart = function ()
@@ -218,13 +193,16 @@
 			.attr("class", function(d){ d.shape = this; return "link" })
 			.style("marker-end",  "url(#arrow)")
 			.style("stroke-width", '1')
-			.on("click", function(d, l) {
+			.on("mousedown", function(d, l) {
 				if (d3.event.defaultPrevented) return; // click suppressed
 				if(!d3.event.shiftKey) return;
 				//assetOverlay(d);
 				if(window['node_pressed']){
 					node_pressed.call(graph.node_lut[d._id], d3.event);
 				}
+			})
+			.on('mouseover', function(d){ 
+				d3.select(this).style('cursor', 'alias');
 			})
 		;
 
@@ -236,15 +214,15 @@
 			return d._id;
 		});
 		
-		this.svgNodes.enter().append('svg:g').call(graph.force.drag()
+		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
 				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
 				.on("drag", function(d) { graph.drag(); }));
 		
-		this.svgNodes.append("circle")
+		g.append("circle")
 			.attr("r", 10)
 			.attr("class", function(d){ d.shape = this; return "nodeBG"});
 
-		this.svgNodes.append('svg:circle')
+		g.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)
 			.attr("fill", function(d) {
@@ -267,20 +245,17 @@
 			.text(function(d) {
 				return (d.file)? d.file.split('/').pop() : d._id;
 			});
-
-		//for delete elements in the DOM if they are more elements DOM than number svgLabels-data
-		this.svgLabels.exit().remove(); 
 		
-		this.svgNodes.append(function(d){
+		g.append(function(d){
 			return graph.nodeText(d);
 		});
 
-		this.svgNodes.append("a")
+		g.append("a")
 			.attr('xlink:href', function(d) {
 				return '#'+d._id;
 			});
 
-		this.svgNodes.on("click", function(d) {
+		g.on("click", function(d) {
 			if (d3.event.defaultPrevented) return; // click suppressed
 			//assetOverlay(d);
 			if(window['node_pressed']){
@@ -315,7 +290,7 @@
 //				return  thumbnail(d);
 //			});
 		
-		var tools = this.svgNodes.append('svg:g')
+		var tools = g.append('svg:g')
 			.attr("class", "tools")
 			.style('opacity', '0');
 		
@@ -357,11 +332,11 @@
 			.attr('width', 4)
 			.attr('height', 4);
 
-		this.svgNodes.on("mouseover", function(d) {
+		g.on("mouseover", function(d) {
 			var nodeSelection = d3.select(this);
 			nodeSelection.select('g').style({opacity:'1.0'});
 		});
-		this.svgNodes.on("mouseout", function(d) {
+		g.on("mouseout", function(d) {
 			var nodeSelection = d3.select(this);
 			nodeSelection.select('g').style({opacity:'0.0'});
 		});
