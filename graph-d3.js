@@ -195,8 +195,7 @@
 			.style("stroke-width", '1')
 			.on("mousedown", function(d, l) {
 				if (d3.event.defaultPrevented) return; // click suppressed
-				if(!d3.event.shiftKey) return;
-				//assetOverlay(d);
+//				if(!d3.event.shiftKey) return;
 				if(window['node_pressed']){
 					node_pressed.call(graph.node_lut[d._id], d3.event);
 				}
@@ -290,47 +289,47 @@
 //				return  thumbnail(d);
 //			});
 		
-		var tools = g.append('svg:g')
-			.attr("class", "tools")
-			.style('opacity', '0');
-		
-		var toolsBGCircle = tools.append("circle")
-			.attr('r', 17)
-			.attr('cx', '0')
-			.attr('cy', '0')
-			.style('opacity', '0');
-		
-		var openCircle = tools.append("circle")
-			.attr('r', 3)
-			.attr('cx', '-10')
-			.attr('cy', '10')
-			.style("stroke", "white")
-			.style("stroke-width", 0.5)
-			.attr('fill', 'white');
-
-		var shareCircle = tools.append("circle")
-			.attr('r', 3)
-			.attr('cx', '-14')
-			.attr('cy', '0')
-			.style("stroke", "white")
-			.style("stroke-width", 0.5)
-			.attr('fill', 'white');
-
-		var deleteCircle = tools.append("circle")
-			.attr('r', 3)
-			.attr('cx', '-10')
-			.attr('cy', '-10')
-			.style("stroke", "white")
-			.style("stroke-width", 0.5)
-			.attr('fill', 'white');
-
-		var openPlus = tools.append("svg:image")
-			.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
-			.attr("class", "openPlus")
-			.attr('x', '-12')
-			.attr('y', '8')
-			.attr('width', 4)
-			.attr('height', 4);
+//		var tools = g.append('svg:g')
+//			.attr("class", "tools")
+//			.style('opacity', '0');
+//		
+//		var toolsBGCircle = tools.append("circle")
+//			.attr('r', 17)
+//			.attr('cx', '0')
+//			.attr('cy', '0')
+//			.style('opacity', '0');
+//		
+//		var openCircle = tools.append("circle")
+//			.attr('r', 3)
+//			.attr('cx', '-10')
+//			.attr('cy', '10')
+//			.style("stroke", "white")
+//			.style("stroke-width", 0.5)
+//			.attr('fill', 'white');
+//
+//		var shareCircle = tools.append("circle")
+//			.attr('r', 3)
+//			.attr('cx', '-14')
+//			.attr('cy', '0')
+//			.style("stroke", "white")
+//			.style("stroke-width", 0.5)
+//			.attr('fill', 'white');
+//
+//		var deleteCircle = tools.append("circle")
+//			.attr('r', 3)
+//			.attr('cx', '-10')
+//			.attr('cy', '-10')
+//			.style("stroke", "white")
+//			.style("stroke-width", 0.5)
+//			.attr('fill', 'white');
+//
+//		var openPlus = tools.append("svg:image")
+//			.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
+//			.attr("class", "openPlus")
+//			.attr('x', '-12')
+//			.attr('y', '8')
+//			.attr('width', 4)
+//			.attr('height', 4);
 
 		g.on("mouseover", function(d) {
 			var nodeSelection = d3.select(this);
