@@ -70,8 +70,8 @@
 
 //		this.svgNodes = this.g1.selectAll('g');
 //		this.svgLinks = this.g2.selectAll('path');
-		this.svgNodes = d3.select(this.g1).selectAll('g');
-		this.svgLinks = d3.select(this.g2).selectAll('path');
+		this.svgNodes = d3.select(this.g2).selectAll('g');
+		this.svgLinks = d3.select(this.g1).selectAll('path');
 		this.force.on("tick", this.tick);
 
 
@@ -161,20 +161,44 @@
 		var shape = this.getShape(node);
 		var remove , pos;
 		
-		(node.src_id && node.tgt_id) ? remove = this.d3_links : remove = this.d3_nodes ;
-		
-		for(var x= 0; x < remove.length; x++)
+		if(node.src_id && node.tgt_id)
 		{
-			if(remove[x]._id == node._id){
-				pos = x;
-			}
+			remove = this.d3_links;
+			pos = search(remove);
+			remove.splice(pos, 1);
 		}
+		else
+		{
+			remove = this.d3_nodes ;
+			pos = search(remove);
+			remove.splice(pos, 1);
+			spliceLinksForNode(node);
+		}
+		
 		this._removeNode(node);
 		
-		delete this.node_lut[node._id];
-		remove.splice(pos, 1);
 		this.restart();
 		return true;
+
+		function search(remove){
+			for(var x= 0; x < remove.length; x++)
+			{
+				if(remove[x]._id == node._id){
+					return x;
+				}
+			}
+		}
+		
+		function spliceLinksForNode(node) {
+			var links = graph.links;
+			var toSplice = graph.d3_links.filter(function(l) { 
+				return (l.source._id === node._id || l.target._id === node._id);
+			});
+			toSplice.map(function(l) {
+				graph.d3_links.splice(graph.d3_links.indexOf(l), 1);
+				graph.links.splice(graph.links.indexOf(l), 1) 
+			});
+		}
 	}
 
 	damasGraph.prototype.restart = function ()
@@ -189,21 +213,23 @@
 		this.svgLinks.classed('selected' , function(d){ d.shape = this; return false; });
 
 		// add new links
-		this.svgLinks.enter().append("svg:path")
+		var path = this.svgLinks.enter().append("svg:path")
 			.attr("class", function(d){ d.shape = this; return "link" })
 			.style("marker-end",  "url(#arrow)")
 			.style("stroke-width", '1')
-			.on("mousedown", function(d, l) {
+			.on("click", function(d, l) {
 				if (d3.event.defaultPrevented) return; // click suppressed
-//				if(!d3.event.shiftKey) return;
 				if(window['node_pressed']){
 					node_pressed.call(graph.node_lut[d._id], d3.event);
 				}
 			})
-			.on('mouseover', function(d){ 
-				d3.select(this).style('cursor', 'alias');
+			.on("mouseover", function(d) {
+				path.style({stroke:'red'});
+				
 			})
-		;
+			.on("mouseout", function(d) {
+				path.style({stroke:'#364e64'})
+			});
 
 		//for delete elements in the DOM if they are more elements DOM than number links-data
 		this.svgLinks.exit().remove(); 
@@ -224,7 +250,7 @@
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)
-			.attr("fill", function(d) {
+			.style("fill", function(d) {
 				return "url(#thumbPat"+d._id+")";
 			})
 			.attr("class", "node");
@@ -244,6 +270,9 @@
 			.text(function(d) {
 				return (d.file)? d.file.split('/').pop() : d._id;
 			});
+
+		//for delete elements in the DOM if they are more elements DOM than number svgLabels-data
+		this.svgLabels.exit().remove(); 
 		
 		g.append(function(d){
 			return graph.nodeText(d);
@@ -289,56 +318,50 @@
 //				return  thumbnail(d);
 //			});
 		
-//		var tools = g.append('svg:g')
-//			.attr("class", "tools")
-//			.style('opacity', '0');
-//		
-//		var toolsBGCircle = tools.append("circle")
-//			.attr('r', 17)
-//			.attr('cx', '0')
-//			.attr('cy', '0')
-//			.style('opacity', '0');
-//		
-//		var openCircle = tools.append("circle")
-//			.attr('r', 3)
-//			.attr('cx', '-10')
-//			.attr('cy', '10')
-//			.style("stroke", "white")
-//			.style("stroke-width", 0.5)
-//			.attr('fill', 'white');
-//
-//		var shareCircle = tools.append("circle")
-//			.attr('r', 3)
-//			.attr('cx', '-14')
-//			.attr('cy', '0')
-//			.style("stroke", "white")
-//			.style("stroke-width", 0.5)
-//			.attr('fill', 'white');
-//
-//		var deleteCircle = tools.append("circle")
-//			.attr('r', 3)
-//			.attr('cx', '-10')
-//			.attr('cy', '-10')
-//			.style("stroke", "white")
-//			.style("stroke-width", 0.5)
-//			.attr('fill', 'white');
-//
-//		var openPlus = tools.append("svg:image")
-//			.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
-//			.attr("class", "openPlus")
-//			.attr('x', '-12')
-//			.attr('y', '8')
-//			.attr('width', 4)
-//			.attr('height', 4);
+		var tools = g.append('svg:g')
+			.attr("class", "tools")
+			.style('opacity', '0');
+		
+		var openCircle = tools.append("circle")
+			.attr('r', 3)
+			.attr('cx', '-10')
+			.attr('cy', '10')
+			.style("stroke", "white")
+			.style("stroke-width", 0.5)
+			.attr('fill', 'white');
+
+		var shareCircle = tools.append("circle")
+			.attr('r', 3)
+			.attr('cx', '-14')
+			.attr('cy', '0')
+			.style("stroke", "white")
+			.style("stroke-width", 0.5)
+			.attr('fill', 'white');
+
+		var deleteCircle = tools.append("circle")
+			.attr('r', 3)
+			.attr('cx', '-10')
+			.attr('cy', '-10')
+			.style("stroke", "white")
+			.style("stroke-width", 0.5)
+			.attr('fill', 'white');
+
+		var openPlus = tools.append("svg:image")
+			.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
+			.attr("class", "openPlus")
+			.attr('x', '-12')
+			.attr('y', '8')
+			.attr('width', 4)
+			.attr('height', 4);
 
 		g.on("mouseover", function(d) {
-			var nodeSelection = d3.select(this);
-			nodeSelection.select('g').style({opacity:'1.0'});
+			tools.style({opacity:'1.0'});
 		});
 		g.on("mouseout", function(d) {
-			var nodeSelection = d3.select(this);
-			nodeSelection.select('g').style({opacity:'0.0'});
+			tools.style({opacity:'0.0'});
 		});
+		
+		
 
 		//for delete elements in the DOM if they are more elements DOM than number nodes-data
 		this.svgNodes.exit().remove(); 

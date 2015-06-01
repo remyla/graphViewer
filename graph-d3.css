@@ -71,6 +71,7 @@
 }
 .openPlus {
 	fill: white;
+	cursor: pointer;
 }
 
 .link {
