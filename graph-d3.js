@@ -157,6 +157,49 @@
 		return shape;
 	}
 
+	/**
+	 * Main method which calls other methods for get links and nodes related to a node given.
+	 * This method first get a list of links and nodes related to node given. 
+	 * Then  these links and nodes are highlighted in orange.
+	 * Finally is applied the opacity to elements which aren't included in the firs list.
+	 * @param {Object} node - Array object (node to search his connections)
+	 */
+	damasGraph.prototype.showConnections = function( node ){ 
+		//Get a list of links & nodes related and highlight in orange 
+		var data = this._getNeighborsR(node);
+		
+		if(data){
+			//Highlight in orange links and nodes
+			this._highlightConnections(data);
+
+			//Get nodes and links not related to main node
+			var targetsRemaining = this._getTargetsRemaining(data);
+
+			//Aply opacity to Links
+			var l = targetsRemaining.unrelated_links.map(function(l){ 
+			var shape = graph.getShape(graph.node_lut[l]);
+				graph._toogleOpacity(shape);
+			});
+
+			//Aply opacity to Nodes
+			var n = targetsRemaining.unrelated_nodes.map(function(n){ 
+				var shape = graph.getShape(graph.node_lut[n])
+				shape = shape.parentNode; //Needed to apply the opacity also the extension file.
+				graph._toogleOpacity(shape);
+			});
+
+			//Aply opacity to Labels
+			var labels = this.svgLabels[0];
+			for (var i = 0; i < labels.length; i++)
+			{
+				if(data.related_nodes.indexOf(this.node_lut[this.nodes[i]._id]._id) == -1)
+					this._toogleOpacity(labels[i]);
+			}
+
+			return true;
+		}
+	}
+
 	damasGraph.prototype.removeNode = function( node ){ 
 		var shape = this.getShape(node);
 		var remove , pos;
@@ -224,11 +267,11 @@
 				}
 			})
 			.on("mouseover", function(d) {
-				path.style({stroke:'red'});
+				//path.style({stroke:'red'});
 				
 			})
 			.on("mouseout", function(d) {
-				path.style({stroke:'#364e64'})
+				//path.style({stroke:'#364e64'})
 			});
 
 		//for delete elements in the DOM if they are more elements DOM than number links-data
@@ -355,9 +398,15 @@
 			.attr('height', 4);
 
 		g.on("mouseover", function(d) {
+			graph.nodeOver = graph.node_lut[d._id];
+			graph.showConnections(graph.node_lut[d._id]);
 			tools.style({opacity:'1.0'});
 		});
 		g.on("mouseout", function(d) {
+			if(graph.nodeOver){
+				graph.nodeOver = null;
+				graph.showConnections(graph.node_lut[d._id]);
+			}
 			tools.style({opacity:'0.0'});
 		});
 		

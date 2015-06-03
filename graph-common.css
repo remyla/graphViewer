@@ -91,14 +91,18 @@ line.red marker {
 line:hover {
 	stroke: #a3330a;
 }
-/*
+
 path.link:hover {
 	stroke: red;
 	cursor: alias;
 }
-*/
+
 circle:hover {
 	opacity: 0.7;
+}
+.select_orange {
+	stroke: orange;
+	stroke-width: 2;
 }
 @keyframes blinker {
 	0% { opacity: 1.0; }
