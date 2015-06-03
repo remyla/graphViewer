@@ -86,6 +86,39 @@
 	}
 
 	/**
+	 * Main method which calls other methods for get links and nodes related to a node given.
+	 * This method first get a list of links and nodes related to node given. 
+	 * Then  these links and nodes are highlighted in orange.
+	 * Finally is applied the opacity to elements which aren't included in the firs list.
+	 * @param {Object} node - Array object (node to search his connections)
+	 */
+	damasGraph.prototype.showConnections = function( node ){ 
+		//Get a list of links & nodes related and highlight in orange 
+		var data = this._getNeighbors(node);
+		
+		if(data){
+			//Highlight in orange links and nodes
+			this._highlightConnections(data);
+
+			//Get nodes and links not related to main node
+			var targetsRemaining = this._getTargetsRemaining(data);
+
+			//Aply opacity to Links
+			var l = targetsRemaining.unrelated_links.map(function(l){ 
+			var shape = graph.getShape(graph.node_lut[l]);
+				graph._toogleOpacity(shape);
+			});
+			
+			//Aply opacity to Nodes
+			var n = targetsRemaining.unrelated_nodes.map(function(n){ 
+				var shape = graph.getShape(graph.node_lut[n])
+				graph._toogleOpacity(shape);
+			});
+			return true;
+		}
+	}
+
+	/**
 	 * Clear the graph
 	 */
 	damasGraph.prototype.erase = function( ){
@@ -272,6 +305,19 @@
 					circle.addEventListener( 'click', function(e){
 						if(window['node_pressed']){
 							node_pressed.call(this, e);
+						}
+					}.bind(graph.node_lut[node.data._id]));
+
+					//Add listeners for get the connections
+					a.addEventListener( 'mouseover', function(e){ console.log('youuuu');
+						graph.nodeOver = this;
+						graph.showConnections(this);
+					}.bind(graph.node_lut[node.data._id]));
+
+					a.addEventListener( 'mouseout', function(e){
+						if(graph.nodeOver){
+							graph.nodeOver = null;
+							graph.showConnections(this);
 						}
 					}.bind(graph.node_lut[node.data._id]));
 				}

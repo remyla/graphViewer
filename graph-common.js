@@ -14,6 +14,8 @@
 		this.links = [];
 		this.selection = [];
 		this.node_lut = {};
+		this.nodeOver = false;
+		this.highlighted_connections = [];
 		this.initDebugFrame(document.querySelector('#graphDebug'));
 		this.init(htmlelem);
 		this.refreshDebugFrame();
@@ -38,6 +40,7 @@
 			this.getShape(this.selection[x]).classList.remove('selected');
 		}
 		this.selection.length = 0;
+		this.nodeClic.length = 0;
 		this.refreshDebugFrame();
 	}
 
@@ -66,6 +69,149 @@
 			this.newEdge( l );
 		}
 		return true;
+	}
+
+	/**
+	 * Method for get the links and nodes related to a node given. 
+	 * @param {Object} node - Array object (generic damas node)
+	 * @return {Object} data - Array object with the links & nodes related to node given
+	 */
+	damasGraph.prototype._getNeighbors = function( node )
+	{ 
+		var nodeOrigin;
+		var counter = 0;
+
+		var data = {related_links: [], related_nodes: [] };
+
+		getTargetsR(node);
+
+		function getTargetsR(node)
+		{
+			if(counter == 0)
+			{
+				nodeOrigin = node;
+				data.related_nodes.push(node._id);
+			}
+			if(node == nodeOrigin && counter != 0)
+				return;
+
+			function getLinksNeighbors( node ){
+				var lin = graph.links.filter(function(l) { 
+					return (l.src_id === node._id ); 
+				});
+				return lin;
+			}
+
+			var connections = getLinksNeighbors(node);
+
+			var nodes = connections.map(function(l){
+				var idTarget = l.tgt_id;
+				return graph.nodes.filter(function(n){
+					return (n._id === idTarget);
+				})
+			});
+
+			nodes = nodes.map(function(n){return n[0]}); 
+
+			connections.map(function(l){
+				var link = graph.node_lut[l._id]._id;
+				if(data.related_links.indexOf(link)== -1){
+					data.related_links.push(link);
+				}
+			});
+
+			for(var y = 0; y < nodes.length; y++)
+			{
+				var n = graph.node_lut[nodes[y]._id];
+				if(data.related_nodes.indexOf(n._id) == -1){
+					data.related_nodes.push(n._id);
+					counter++;
+					if(getLinksNeighbors(n).length > 0)
+					{
+						getTargetsR(n);
+					}
+				}
+			}
+		}
+		return data;
+	}
+
+	/**
+	 * Method for get the links and nodes not contained in the list of links and nodes related to node given. 
+	 * @param {Object} data - Array object (nodes and links related to a node)
+	 * @return {Object} remaining - Array object (nodes and links not related to a node)
+	 */
+	damasGraph.prototype._getTargetsRemaining = function( data ) {
+		var remaining = { unrelated_links:[], unrelated_nodes:[] };
+
+		//Links
+		for (var i = 0; i < this.links.length; i++)
+		{
+			if(data.related_links.indexOf(this.node_lut[this.links[i]._id]._id) == -1)
+				remaining.unrelated_links.push(this.node_lut[this.links[i]._id]._id);
+		}
+
+		//Nodes
+		for (var i = 0; i < this.nodes.length; i++)
+		{
+			if(data.related_nodes.indexOf(this.node_lut[this.nodes[i]._id]._id) == -1)
+				remaining.unrelated_nodes.push(this.node_lut[this.nodes[i]._id]._id);
+		}
+
+		return remaining;
+	}
+	
+	/**
+	 * Method for highlight the links and nodes contains in the array object. 
+	 * @param {Object} data - Array object (nodes and links related to a node)
+	 * @return {boolean} 
+	 */
+	damasGraph.prototype._highlightConnections = function( data ) { 
+		data.related_links.map(function(l){
+			var link = graph.node_lut[l];
+			graph._highlightSelectedOrange(link);
+		});
+		data.related_nodes.map(function(n){
+			var node = graph.node_lut[n];
+			graph._highlightSelectedOrange(node);
+		});
+		
+		return true;
+	}
+
+	/**
+	 * Method for highlight in orange the object passed. 
+	 * @param {Object} node - Array object (object to highlight)
+	 */
+	damasGraph.prototype._highlightSelectedOrange = function( node ) { 
+
+			var position = this.highlighted_connections.indexOf(node);
+			
+			(position === -1 ) ? this.highlighted_connections.push( node ) : this.highlighted_connections.splice( position, 1 );
+			
+			if(node.tgt_id && node.src_id)
+			{
+				if(this.getShape(node).style.stroke == "" || this.getShape(node).style.stroke == "rgb(54, 78, 100)")
+					this.getShape(node).style.stroke ='orange';
+				else if(this.getShape(node).style.stroke == "orange")
+					this.getShape(node).style.stroke ='';
+			}
+			else
+				this.getShape(node).classList.toggle('select_orange');
+
+			this.refreshDebugFrame();
+	}
+
+	/**
+	 * Method for apply opacity to nodes & links not related.
+	 * @param {Object} shape - Object with the shape to apply the opacity
+	 */
+	damasGraph.prototype._toogleOpacity = function( shape )
+	{
+		if(shape.style.opacity == "1" || shape.style.opacity === "")
+			shape.style.opacity = "0.2";
+		else
+			shape.style.opacity = "1";
 	}
 
 	damasGraph.prototype.fetchJSONFile = function(path, callback)
@@ -215,9 +361,9 @@
 
 		var gBox = document.createElementNS("http://www.w3.org/2000/svg", "g");
 		var g1 = document.createElementNS("http://www.w3.org/2000/svg", "g");
-		g1.setAttribute('class', 'nodes');
+		g1.setAttribute('class', 'edges');
 		var g2 = document.createElementNS("http://www.w3.org/2000/svg", "g");
-		g2.setAttribute('class', 'edges');
+		g2.setAttribute('class', 'nodes');
 		var g3 = document.createElementNS("http://www.w3.org/2000/svg", "g");
 		g3.setAttribute('class', 'texts');
 		svg.appendChild(defs);
