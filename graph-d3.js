@@ -243,6 +243,42 @@
 				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
 				.on("drag", function(d) { graph.drag(); }));
 		
+		var tools = g.append('svg:g')
+			.attr("class", "tools")
+			.style('display', 'none');
+		
+		var openCircle = tools.append("circle")
+			.attr('r', 3)
+			.attr('cx', '-8.5')
+			.attr('cy', '8.5')
+			.style("stroke", "white")
+			.style("stroke-width", 0.5)
+			.attr('fill', 'white');
+
+		var shareCircle = tools.append("circle")
+			.attr('r', 3)
+			.attr('cx', '-12')
+			.attr('cy', '0')
+			.style("stroke", "white")
+			.style("stroke-width", 0.5)
+			.attr('fill', 'white');
+
+		var deleteCircle = tools.append("circle")
+			.attr('r', 3)
+			.attr('cx', '-8.5')
+			.attr('cy', '-8.5')
+			.style("stroke", "white")
+			.style("stroke-width", 0.5)
+			.attr('fill', 'white');
+
+		var openPlus = tools.append("svg:image")
+			.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
+			.attr("class", "openPlus")
+			.attr('x', '-10.25')
+			.attr('y', '7')
+			.attr('width', 3.5)
+			.attr('height', 3.5);
+		
 		g.append("circle")
 			.attr("r", 10)
 			.attr("class", function(d){ d.shape = this; return "nodeBG"});
@@ -318,47 +354,15 @@
 //				return  thumbnail(d);
 //			});
 		
-		var tools = g.append('svg:g')
-			.attr("class", "tools")
-			.style('opacity', '0');
 		
-		var openCircle = tools.append("circle")
-			.attr('r', 3)
-			.attr('cx', '-10')
-			.attr('cy', '10')
-			.style("stroke", "white")
-			.style("stroke-width", 0.5)
-			.attr('fill', 'white');
-
-		var shareCircle = tools.append("circle")
-			.attr('r', 3)
-			.attr('cx', '-14')
-			.attr('cy', '0')
-			.style("stroke", "white")
-			.style("stroke-width", 0.5)
-			.attr('fill', 'white');
-
-		var deleteCircle = tools.append("circle")
-			.attr('r', 3)
-			.attr('cx', '-10')
-			.attr('cy', '-10')
-			.style("stroke", "white")
-			.style("stroke-width", 0.5)
-			.attr('fill', 'white');
-
-		var openPlus = tools.append("svg:image")
-			.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
-			.attr("class", "openPlus")
-			.attr('x', '-12')
-			.attr('y', '8')
-			.attr('width', 4)
-			.attr('height', 4);
 
 		g.on("mouseover", function(d) {
-			tools.style({opacity:'1.0'});
+//			tools.style({opacity:'1.0'});
+			tools.style({display:'block'});
 		});
 		g.on("mouseout", function(d) {
-			tools.style({opacity:'0.0'});
+//			tools.style({opacity:'0.0'});
+			tools.style({display:'none'});
 		});
 		
 		

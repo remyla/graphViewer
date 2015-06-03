@@ -269,7 +269,7 @@
 					graph.g3.appendChild(node.text);
 					graph.g2.appendChild(a);
 
-					circle.addEventListener( 'click', function(e){
+					a.addEventListener( 'click', function(e){
 						if(window['node_pressed']){
 							node_pressed.call(this, e);
 						}
