@@ -80,14 +80,10 @@
 	cursor: pointer;
 }
 
-.link {
-	stroke: #364e64;
-/*	stroke-opacity: .6;*/
-}
-
 .label {
 	font: 6px arial;
 	fill:white;
+	pointer-events: none;
 /*	stroke:white;*/
 }
 
