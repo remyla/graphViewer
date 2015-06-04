@@ -178,14 +178,14 @@
 			//Aply opacity to Links
 			var l = targetsRemaining.unrelated_links.map(function(l){ 
 			var shape = graph.getShape(graph.node_lut[l]);
-				graph._toogleOpacity(shape);
+				graph._toggleOpacity(shape);
 			});
 
 			//Aply opacity to Nodes
 			var n = targetsRemaining.unrelated_nodes.map(function(n){ 
 				var shape = graph.getShape(graph.node_lut[n])
 				shape = shape.parentNode; //Needed to apply the opacity also the extension file.
-				graph._toogleOpacity(shape);
+				graph._toggleOpacity(shape);
 			});
 
 			//Aply opacity to Labels
@@ -193,10 +193,43 @@
 			for (var i = 0; i < labels.length; i++)
 			{
 				if(data.related_nodes.indexOf(this.node_lut[this.nodes[i]._id]._id) == -1)
-					this._toogleOpacity(labels[i]);
+					this._toggleOpacity(labels[i]);
 			}
 
 			return true;
+		}
+	}
+
+	damasGraph.prototype.unhighlightElements = function ( )
+	{
+		//Unhighlight elements commons (links)
+		this.unhighlightLinks();
+
+		var nodes = this.nodes;
+		var labels = this.svgLabels[0];
+
+		//Remove orange and opacity to nodes
+		for(var x = 0; x < nodes.length; x++){
+
+			var node = this.node_lut[nodes[x]._id];
+			var shape = this.getShape(this.node_lut[nodes[x]._id]);
+			shape = shape.parentNode;
+			if(this.getShape(node).classList.contains("select_orange"))
+				this._highlightSelectedOrange(node);
+
+			if(shape.style.opacity == "0.2")
+				this._toggleOpacity(shape);
+			
+		}
+		
+		//Remove opacity to Labels
+		for (var i = 0; i < labels.length; i++)
+		{
+			var label = labels[i];
+
+			if(label.style.opacity == "0.2")
+				this._toggleOpacity(label);
+			
 		}
 	}
 
@@ -398,17 +431,13 @@
 		
 		
 
-		g.on("mouseover", function(d) {
-			graph.nodeOver = graph.node_lut[d._id];
+		g.on("mouseenter", function(d) {
 			graph.showConnections(graph.node_lut[d._id]);
 //			tools.style({opacity:'1.0'});
 			tools.style({display:'block'});
 		});
-		g.on("mouseout", function(d) {
-			if(graph.nodeOver){
-				graph.nodeOver = null;
-				graph.showConnections(graph.node_lut[d._id]);
-			}
+		g.on("mouseleave", function(d) {
+			graph.unhighlightElements();
 //			tools.style({opacity:'0.0'});
 			tools.style({display:'none'});
 		});
