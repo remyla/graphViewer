@@ -187,12 +187,12 @@
 
 			var link = this.node_lut[links[x]._id];
 			var shape = this.getShape(this.node_lut[links[x]._id]);
-			if(this.getShape(link).style.stroke == "orange"){
-				this.getShape(link).style.stroke ='';
+			if(shape.classList.contains("linkH")){
+				shape.classList.remove("linkH");
 				this.getShape(link).style['marker-end'] ="url(#arrowD)";
 			}
 
-			if(shape.style.opacity == "0.2")
+			if(shape.classList.contains("withOpacity"))
 				this._toggleOpacity(shape);	
 		}
 	}
@@ -207,13 +207,13 @@
 			
 			if(node.tgt_id && node.src_id)
 			{
-				if(shape.style.stroke == "" || shape.style.stroke == "rgb(54, 78, 100)") {
-					shape.style['stroke'] ='orange';
-					shape.style['marker-end'] ="url(#arrowH)";
-				}
-				else if(shape.style.stroke == "orange") {
-					shape.style.stroke ='';
+				if(shape.classList.contains("linkH")) {
+					shape.classList.remove("linkH");
 					shape.style['marker-end'] ="url(#arrowD)";
+				}
+				else {
+					shape.classList.add("linkH");
+					shape.style['marker-end'] ="url(#arrowH)";
 				}
 			}
 			else
@@ -226,10 +226,7 @@
 	 */
 	damasGraph.prototype._toggleOpacity = function( shape )
 	{
-		if(shape.style.opacity == "1" || shape.style.opacity === "")
-			shape.style.opacity = "0.2";
-		else
-			shape.style.opacity = "1";
+		(shape.classList.contains("withOpacity")) ? shape.classList.remove("withOpacity") : shape.classList.add("withOpacity");
 	}
 
 	damasGraph.prototype.fetchJSONFile = function(path, callback)
