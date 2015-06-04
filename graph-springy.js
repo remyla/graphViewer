@@ -139,15 +139,15 @@
 			var node = this.node_lut[nodes[x]._id];
 			var shape = this.getShape(this.node_lut[nodes[x]._id]);
 			var text = this.getText(this.node_lut[nodes[x]._id]); 
-		//	console.log(text);
+		
 			if(this.getShape(node).classList.contains("select_orange"))
 				this._highlightSelectedOrange(node);
 
-			if(shape.style.opacity == "0.2")
+			if(shape.classList.contains("withOpacity"))
 				this._toggleOpacity(shape);
 
 
-			if(text.style.opacity == "0.2")
+			if(text.classList.contains("withOpacity"))
 				this._toggleOpacity(text);
 			
 		}

@@ -217,9 +217,8 @@
 			if(this.getShape(node).classList.contains("select_orange"))
 				this._highlightSelectedOrange(node);
 
-			if(shape.style.opacity == "0.2")
+			if(shape.classList.contains("withOpacity"))
 				this._toggleOpacity(shape);
-			
 		}
 		
 		//Remove opacity to Labels
@@ -227,7 +226,7 @@
 		{
 			var label = labels[i];
 
-			if(label.style.opacity == "0.2")
+			if(label.classList.contains("withOpacity"))
 				this._toggleOpacity(label);
 			
 		}
