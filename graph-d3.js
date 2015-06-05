@@ -258,8 +258,8 @@
 		// add new links
 		var path = this.svgLinks.enter().append("svg:path")
 			.attr("class", function(d){ d.shape = this; return "link" })
-			.style("marker-end",  "url(#arrowD)")
-//			.style("stroke-width", '1')
+//			.style("marker-end",  "url(#arrowD)")
+			.attr("style", function(d){ return d.style;})
 			.on("click", function(d, l) {
 				if (d3.event.defaultPrevented) return; // click suppressed
 				if(window['node_pressed']){
@@ -323,8 +323,9 @@
 		
 		g.append("circle")
 			.attr("r", 10)
-			.attr("class", function(d){ d.shape = this; return "nodeBG"});
-
+			.attr("class", function(d){ d.shape = this; return "nodeBG"})
+			.attr("style", function(d){ return d.style;});
+		
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })
 			.attr("r", 10)

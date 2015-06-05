@@ -417,7 +417,13 @@
 		ext.setAttribute('dy', 2);
 		if (node.file && !node.image){
 			ext.textContent = node.file.split(".").pop().toUpperCase();
+			return ext;
 		}
+		if (node.abbr){
+			ext.textContent = node.abbr.toUpperCase();
+			return ext;
+		}
+		//To do : Find a way to prevent element ext creation if no text
 		return ext;
 	}
 

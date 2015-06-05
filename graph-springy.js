@@ -159,6 +159,7 @@
 					{
 						edge.shape.setAttribute('marker-end', 'url(#arrowTimealert)' );
 						edge.shape.setAttribute('class', 'timealert' );
+						edge.shape.setAttribute('style', edge.data.style);
 						console.log(edge.source);
 						//edge.source.shape.style.stroke = 'red';
 						//edge.source.shape.style.strokeWidth = '1';
@@ -220,6 +221,7 @@
 					var circleBG = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
 					circleBG.setAttribute('class','nodeBG');
 					circleBG.setAttribute('r',springy_damas.ray);
+					circleBG.setAttribute('style', node.data.style);
 					a.appendChild(circleBG);
 
 					var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
