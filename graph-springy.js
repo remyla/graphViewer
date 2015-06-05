@@ -187,7 +187,6 @@
 					{
 						edge.shape.setAttribute('marker-end', 'url(#arrowTimealert)' );
 						edge.shape.setAttribute('class', 'timealert' );
-						edge.shape.setAttribute('style', edge.data.style);
 						console.log(edge.source);
 						//edge.source.shape.style.stroke = 'red';
 						//edge.source.shape.style.strokeWidth = '1';
@@ -195,6 +194,7 @@
 					else
 					{
 						edge.shape.setAttribute('marker-end', 'url(#arrow)' );
+						edge.shape.setAttribute('style', edge.data.style);
 					}
 					edge.shape.addEventListener( 'click', function(e){
   						if(window['node_pressed']){

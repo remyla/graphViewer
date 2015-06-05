@@ -425,12 +425,6 @@
 			.attr('height', 1);
 //			.attr('preserveAspectRatio', 'xMidYMid slice');
 		
-//		image.attr('xlink:href', function(d) {
-//				return  thumbnail(d);
-//			});
-		
-		
-
 		g.on("mouseenter", function(d) {
 			graph.showConnections(graph.node_lut[d._id]);
 //			tools.style({opacity:'1.0'});
