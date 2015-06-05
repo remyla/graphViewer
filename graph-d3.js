@@ -22,6 +22,12 @@
 			.attr("viewBox", "0 0 " + width + " " + height )
 			.attr("preserveAspectRatio", "xMidYMid meet")
 			.attr("pointer-events", "all")
+			.on('mousemove', function(){ 
+				if(graph.selection.length == 0){
+					return;
+				}
+				graph.force.stop();
+			})
 			.call(d3.behavior.zoom().on("zoom", rescale));
 
 		this.defs = d3.select("defs");
@@ -271,7 +277,11 @@
 			});
 			toSplice.map(function(l) {
 				graph.d3_links.splice(graph.d3_links.indexOf(l), 1);
-				graph.links.splice(graph.links.indexOf(l), 1) 
+				graph.links.splice(graph.links.indexOf(graph.node_lut[l._id]), 1);
+				var position = graph.selection.indexOf(graph.node_lut[l._id]);
+				if(position != -1)
+					graph.selection.splice(position,1);
+
 			});
 		}
 	}
@@ -299,10 +309,16 @@
 				}
 			})
 			.on("mouseover", function(d) {
+				graph.getShape(graph.node_lut[d._id]).classList.add("linkO");
+				graph.force.stop();
 				path.style("marker-end",  "url(#arrowO)")
 			})
 			.on("mouseout", function(d) {
-				path.style("marker-end",  "url(#arrowD)")
+				graph.force.resume();
+				if(graph.selection.indexOf(graph.node_lut[d._id]) == -1){
+					path.style("marker-end",  "url(#arrowD)");
+					graph.getShape(graph.node_lut[d._id]).classList.remove("linkO");
+				}
 			});
 
 		//for delete elements in the DOM if they are more elements DOM than number links-data
@@ -431,11 +447,13 @@
 		
 
 		g.on("mouseenter", function(d) {
+			graph.force.stop();
 			graph.showConnections(graph.node_lut[d._id]);
 //			tools.style({opacity:'1.0'});
 			tools.style({display:'block'});
 		});
 		g.on("mouseleave", function(d) {
+			graph.force.resume();
 			graph.unhighlightElements();
 //			tools.style({opacity:'0.0'});
 			tools.style({display:'none'});
