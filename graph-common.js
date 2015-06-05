@@ -14,8 +14,6 @@
 		this.links = [];
 		this.selection = [];
 		this.node_lut = {};
-		this.nodeOver = false;
-		this.highlighted_connections = [];
 		this.initDebugFrame(document.querySelector('#graphDebug'));
 		this.init(htmlelem);
 		this.refreshDebugFrame();
@@ -179,42 +177,56 @@
 	}
 
 	/**
+	 * Method for unhighlight the links highlighted.
+	 */
+	damasGraph.prototype.unhighlightLinks = function ( ) {
+		
+		var links = this.links;
+
+		for(var x = 0; x < links.length; x++){
+
+			var link = this.node_lut[links[x]._id];
+			var shape = this.getShape(this.node_lut[links[x]._id]);
+			if(shape.classList.contains("linkH")){
+				shape.classList.remove("linkH");
+				this.getShape(link).style['marker-end'] ="url(#arrowD)";
+			}
+
+			if(shape.classList.contains("withOpacity"))
+				this._toggleOpacity(shape);	
+		}
+	}
+
+	/**
 	 * Method for highlight in orange the object passed. 
 	 * @param {Object} node - Array object (object to highlight)
 	 */
 	damasGraph.prototype._highlightSelectedOrange = function( node ) { 
 
-			var position = this.highlighted_connections.indexOf(node);
-			
-			(position === -1 ) ? this.highlighted_connections.push( node ) : this.highlighted_connections.splice( position, 1 );
+			var shape = this.getShape(node);
 			
 			if(node.tgt_id && node.src_id)
 			{
-				if(this.getShape(node).style.stroke == "" || this.getShape(node).style.stroke == "rgb(54, 78, 100)") {
-					this.getShape(node).style['stroke'] ='orange';
-					this.getShape(node).style['marker-end'] ="url(#arrowH)";
+				if(shape.classList.contains("linkH")) {
+					shape.classList.remove("linkH");
+					shape.style['marker-end'] ="url(#arrowD)";
 				}
-				else if(this.getShape(node).style.stroke == "orange") {
-					this.getShape(node).style.stroke ='';
-					this.getShape(node).style['marker-end'] ="url(#arrowD)";
+				else {
+					shape.classList.add("linkH");
+					shape.style['marker-end'] ="url(#arrowH)";
 				}
 			}
 			else
-				this.getShape(node).classList.toggle('select_orange');
-
-			this.refreshDebugFrame();
+				shape.classList.toggle('select_orange');
 	}
 
 	/**
 	 * Method for apply opacity to nodes & links not related.
 	 * @param {Object} shape - Object with the shape to apply the opacity
 	 */
-	damasGraph.prototype._toogleOpacity = function( shape )
+	damasGraph.prototype._toggleOpacity = function( shape )
 	{
-		if(shape.style.opacity == "1" || shape.style.opacity === "")
-			shape.style.opacity = "0.2";
-		else
-			shape.style.opacity = "1";
+		(shape.classList.contains("withOpacity")) ? shape.classList.remove("withOpacity") : shape.classList.add("withOpacity");
 	}
 
 	damasGraph.prototype.fetchJSONFile = function(path, callback)

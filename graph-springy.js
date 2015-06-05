@@ -111,17 +111,45 @@
 			//Aply opacity to Links
 			var l = targetsRemaining.unrelated_links.map(function(l){ 
 			var shape = graph.getShape(graph.node_lut[l]);
-				graph._toogleOpacity(shape);
+				graph._toggleOpacity(shape);
 			});
 			
 			//Aply opacity to Nodes
 			var n = targetsRemaining.unrelated_nodes.map(function(n){ 
 				var shape = graph.getShape(graph.node_lut[n]);
 				var text = graph.getText(graph.node_lut[n]); //Get text each node exluded
-				graph._toogleOpacity(shape);
-				graph._toogleOpacity(text); //apply opacity also the text
+				graph._toggleOpacity(shape);
+				graph._toggleOpacity(text); //apply opacity also the text
 			});
 			return true;
+		}
+	}
+
+	damasGraph.prototype.unhighlightElements = function ( )
+	{
+		//Unhighlight elements commons (links)
+		this.unhighlightLinks();
+
+		var nodes = this.nodes;
+		//var labels = this.svgLabels[0];
+
+		//Remove orange and opacity to nodes
+		for(var x = 0; x < nodes.length; x++){
+
+			var node = this.node_lut[nodes[x]._id];
+			var shape = this.getShape(this.node_lut[nodes[x]._id]);
+			var text = this.getText(this.node_lut[nodes[x]._id]); 
+		
+			if(this.getShape(node).classList.contains("select_orange"))
+				this._highlightSelectedOrange(node);
+
+			if(shape.classList.contains("withOpacity"))
+				this._toggleOpacity(shape);
+
+
+			if(text.classList.contains("withOpacity"))
+				this._toggleOpacity(text);
+			
 		}
 	}
 
@@ -318,17 +346,13 @@
 					}.bind(graph.node_lut[node.data._id]));
 
 					//Add listeners for get the connections
-					a.addEventListener( 'mouseover', function(e){ 
-						graph.nodeOver = this;
+					a.addEventListener( 'mouseenter', function(e){ 
 						graph.showConnections(this);
 					}.bind(graph.node_lut[node.data._id]));
 
-					a.addEventListener( 'mouseout', function(e){
-						if(graph.nodeOver){
-							graph.nodeOver = null;
-							graph.showConnections(this);
-						}
-					}.bind(graph.node_lut[node.data._id]));
+					a.addEventListener( 'mouseleave', function(e){
+						graph.unhighlightElements();
+					});
 				}
 				var s = springy_damas.toScreen(p);
 				node.shape.setAttribute('transform', 'translate(' + s.x + ',' + s.y + ')');

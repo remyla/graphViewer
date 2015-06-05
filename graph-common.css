@@ -81,11 +81,14 @@ line {
 /*	stroke-opacity: .6;*/
 }
 
-.linkO {
+.linkH {
 	stroke: orange;
 /*	marker-end: url(#arrowO);*/
 	stroke-width: 1;
 /*	stroke-opacity: .6;*/
+}
+.withOpacity {
+	opacity: 0.2;
 }
 /*
 #markerArrow {
