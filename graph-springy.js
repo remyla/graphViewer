@@ -20,7 +20,7 @@
 
 	//damasGraph.prototype.init = function ( htmlelem )
 	damasGraph.prototype.init = function ( htmlelem )
-	{
+	{ 	
 		this.springy_graph = new Springy.Graph();
 		this.springy_layout = new Springy.Layout.ForceDirected(this.springy_graph, 300.0, 300.0, 0.5);
 		this.svg = this.init_SVG();
@@ -29,6 +29,11 @@
 		this.svgpanzoominstance = svgPanZoom('#svggraph', { minZoom: 0.1, maxZoom: 10 } );
 		springy_damas.currentBB = this.springy_layout.getBoundingBox();
 		this.springy_renderer = springy_damas.get_renderer( this.springy_layout );
+		htmlelem.addEventListener('mousemove', function(e){
+    		if(graph.selection.length == 0)
+				return;
+			graph.springy_renderer.stop();
+    	});
 		this.springy_renderer.start();
 	}
 
@@ -60,13 +65,36 @@
 
 	damasGraph.prototype.removeNode = function( node ){
 
-		if (this._removeNode(node))
+		var text = graph.getText(graph.node_lut[node._id]);
+	//this.springy_renderer.start();
+		var dataNode = this.springy_lut[node._id];
+		var shape = graph.getShape(graph.node_lut[node._id]);
+		
+		text.parentNode.removeChild(text);
+		shape.parentNode.removeChild(shape);
+		if(!node.src_id && !node.tgt_id)
 		{
-			var dataNode = this.springy_lut[node._id];
-			var shape = dataNode.shape;
-			shape.parentNode.removeChild(shape);
-			var spr_graph = this.springy_graph;
-			(dataNode.source && dataNode.target) ? spr_graph.removeEdge( dataNode ) : spr_graph.removeNode( node );
+			spliceLinksForNode(node);
+		}
+		
+		this._removeNode(node);
+
+		var spr_graph = this.springy_graph;
+		(dataNode.source && dataNode.target) ? spr_graph.removeEdge( dataNode ) : spr_graph.removeNode( dataNode );
+			
+		function spliceLinksForNode(node) {
+			var links = graph.links;
+			var toSplice = links.filter(function(l) { 
+				return (l.src_id === node._id || l.tgt_id === node._id);
+			});
+			toSplice.map(function(l) {
+				var shape = graph.getShape(graph.node_lut[l._id]);
+				shape.parentNode.removeChild(shape);
+				graph.links.splice(graph.links.indexOf(l), 1);
+				var position = graph.selection.indexOf(graph.node_lut[l._id]);
+				if(position != -1)
+					graph.selection.splice(position,1); 
+			});
 		}
 	}
 
@@ -194,12 +222,25 @@
 					}
 					else
 					{
-						edge.shape.setAttribute('marker-end', 'url(#arrow)' );
+						edge.shape.setAttribute('marker-end', 'url(#arrowD)' );
 					}
 					edge.shape.addEventListener( 'click', function(e){
   						if(window['node_pressed']){
 	  						node_pressed.call(this, e);
    						}
+    				}.bind(graph.node_lut[edge.data._id]));
+    				edge.shape.addEventListener( 'mouseover', function(e){
+    					graph.springy_renderer.stop();
+    					edge.shape.style["marker-end"] = "url(#arrowO)";
+  						graph.getShape(graph.node_lut[this._id]).classList.add("linkO");
+    				}.bind(graph.node_lut[edge.data._id]));
+    				
+    				edge.shape.addEventListener( 'mouseout', function(e){ 
+    					graph.springy_renderer.start();
+		  				if(graph.selection.indexOf(graph.node_lut[this._id]) == -1){
+		  					edge.shape.style["marker-end"] = "url(#arrowD)";
+							graph.getShape(graph.node_lut[this._id]).classList.remove("linkO");
+						}
     				}.bind(graph.node_lut[edge.data._id]));
 				}
 				var s1 = springy_damas.toScreen(p1);
@@ -347,10 +388,12 @@
 
 					//Add listeners for get the connections
 					a.addEventListener( 'mouseenter', function(e){ 
+						graph.springy_renderer.stop();
 						graph.showConnections(this);
 					}.bind(graph.node_lut[node.data._id]));
 
 					a.addEventListener( 'mouseleave', function(e){
+						graph.springy_renderer.start();
 						graph.unhighlightElements();
 					});
 				}
