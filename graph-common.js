@@ -19,7 +19,7 @@
 		this.refreshDebugFrame();
 	}
 
-	damasGraph.prototype.selectToggle = function( node ) {
+	damasGraph.prototype.selectToggle = function( node ) { 
 		var position = this.selection.indexOf(node);
 		if (position === -1 )
 		{
@@ -29,7 +29,11 @@
 		{
 			this.selection.splice( position, 1 );
 		}
-		this.getShape(node).classList.toggle('selected');
+		if(this.getShape(node).classList.contains('selected')){
+			this.getShape(node).classList.remove('selected');
+		}
+		else
+			this.getShape(node).classList.add('selected');
 		this.refreshDebugFrame();
 	}
 
@@ -38,6 +42,17 @@
 			this.getShape(this.selection[x]).classList.remove('selected');
 		}
 		this.selection.length = 0;
+		var links = this.links;
+
+		for(var x = 0; x < links.length; x++){
+
+			var link = this.node_lut[links[x]._id];
+			var shape = this.getShape(this.node_lut[links[x]._id]);
+			if(shape.classList.contains("hover"))
+				shape.classList.remove("hover");
+			
+			this.getShape(link).style['marker-end'] = "url(#arrowD)";
+		}
 		this.refreshDebugFrame();
 	}
 
@@ -187,13 +202,15 @@
 
 			var link = this.node_lut[links[x]._id];
 			var shape = this.getShape(this.node_lut[links[x]._id]);
-			if(shape.classList.contains("linkH")){
-				shape.classList.remove("linkH");
+			if(shape.classList.contains("highlight")){
+				shape.classList.remove("highlight");
 				this.getShape(link).style['marker-end'] ="url(#arrowD)";
 			}
 
 			if(shape.classList.contains("withOpacity"))
 				this._toggleOpacity(shape);	
+
+			(this.selection.indexOf(link) != -1) ? shape.style["marker-end"] =  "url(#arrowS)" : shape.style["marker-end"] =  "url(#arrowD)";
 		}
 	}
 
@@ -207,17 +224,17 @@
 			
 			if(node.tgt_id && node.src_id)
 			{
-				if(shape.classList.contains("linkH")) {
-					shape.classList.remove("linkH");
+				if(shape.classList.contains("highlight")) {
+					shape.classList.remove("highlight");
 					shape.style['marker-end'] ="url(#arrowD)";
 				}
 				else {
-					shape.classList.add("linkH");
+					shape.classList.add("highlight");
 					shape.style['marker-end'] ="url(#arrowH)";
 				}
 			}
 			else
-				shape.classList.toggle('select_orange');
+				shape.classList.toggle('highlight');
 	}
 
 	/**
@@ -265,9 +282,12 @@
 
 	damasGraph.prototype._removeNode = function( node )
 	{
-		this.selection.splice(this.selection.indexOf(node), 1);
+		var position = this.selection.indexOf(node);
+		if(position !== -1)
+			this.selection.splice(position, 1);
 		(node.src_id && node.tgt_id) ? this.links.splice(this.links.indexOf(node), 1) : this.nodes.splice(this.nodes.indexOf(node), 1)
 		delete this.node_lut[node._id];
+		this.refreshDebugFrame();
 		return true;
 	}
 
@@ -332,6 +352,19 @@
 		triangleD.setAttribute('d', 'M0,0 L0,6 L6,3 Z' );
 		markerD.appendChild(triangleD);
 		defs.appendChild(markerD);
+		// marker arrow selected
+		var markerS = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+		markerS.setAttribute('id', 'arrowS' );
+		markerS.setAttribute('markerWidth', '6' );
+		markerS.setAttribute('markerHeight', '6' );
+		markerS.setAttribute('refX', '3' );
+		markerS.setAttribute('refY', '3' );
+		markerS.setAttribute('orient', 'auto' );
+		markerS.setAttribute('markerUnits', 'strokeWidth' );
+		var triangleS = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		triangleS.setAttribute('d', 'M0,0 L0,6 L6,3 Z' );
+		markerS.appendChild(triangleS);
+		defs.appendChild(markerS);
 		// marker arrow over
 		var markerO = document.createElementNS("http://www.w3.org/2000/svg", "marker");
 		markerO.setAttribute('id', 'arrowO' );
