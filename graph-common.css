@@ -50,10 +50,6 @@ a circle {
 	cursor: pointer;
 }
 
-.selected {
-	stroke: red;
-	stroke-width: 1;
-}
 
 circle.asset {
 /*
@@ -74,16 +70,24 @@ line {
 /*	stroke-opacity: .6;*/
 }
 
+.hover {
+	stroke : green !important;
+}
+.selected {
+	stroke : red;
+}
+.highlight {
+	stroke : orange;
+}
 .linkD {
 	stroke: #364e64;
 /*	marker-end: url(#arrowD);*/
 	stroke-width: 1;
 /*	stroke-opacity: .6;*/
 }
-
-.linkH {
-	stroke: orange;
-/*	marker-end: url(#arrowO);*/
+.linkO {
+	stroke: red;
+/*	marker-end: url(#arrowD);*/
 	stroke-width: 1;
 /*	stroke-opacity: .6;*/
 }
@@ -97,6 +101,9 @@ line {
 	fill: #364E64;
 }
 #arrowO {
+	fill: green;
+}
+#arrowS {
 	fill: red;
 }
 #arrowH {
@@ -117,22 +124,19 @@ line.red marker {
 	fill: red !important;
 }
 */
-line:hover {
+/*line:hover {
 	stroke: #a3330a;
-}
+}*/
 
-path.link:hover {
+/*path.link:hover {
 	stroke: red;
 	cursor: alias;
-}
+}*/
 
 circle:hover {
 	opacity: 0.7;
 }
-.select_orange {
-	stroke: orange;
-/*	stroke-width: 2;*/
-}
+
 @keyframes blinker {
 	0% { opacity: 1.0; }
 	50% { opacity: 0.0; }
