@@ -22,6 +22,12 @@
 			.attr("viewBox", "0 0 " + width + " " + height )
 			.attr("preserveAspectRatio", "xMidYMid meet")
 			.attr("pointer-events", "all")
+			.on('mousemove', function(){ 
+				if(graph.selection.length == 0){
+					return;
+				}
+				graph.force.stop();
+			})
 			.call(d3.behavior.zoom().on("zoom", rescale));
 
 		this.defs = d3.select("defs");
@@ -214,7 +220,7 @@
 			var node = this.node_lut[nodes[x]._id];
 			var shape = this.getShape(this.node_lut[nodes[x]._id]);
 			shape = shape.parentNode;
-			if(this.getShape(node).classList.contains("select_orange"))
+			if(this.getShape(node).classList.contains("highlight"))
 				this._highlightSelectedOrange(node);
 
 			if(shape.classList.contains("withOpacity"))
@@ -232,7 +238,11 @@
 		}
 	}
 
-	damasGraph.prototype.removeNode = function( node ){ 
+	/*
+	 * Function to delete an element (node or link)
+	 * @param {Object} node- Node damas
+	 */
+	damasGraph.prototype.removeNode = function( node ){
 		var shape = this.getShape(node);
 		var remove , pos;
 		
@@ -250,15 +260,15 @@
 			spliceLinksForNode(node);
 		}
 		
-		this._removeNode(node);
-		
-		this.restart();
-		return true;
+		if(this._removeNode(node)){
+			this.restart();
+			return true;
+		}
 
 		function search(remove){
 			for(var x= 0; x < remove.length; x++)
 			{
-				if(remove[x]._id == node._id){
+				if(remove[x]._id === node._id){
 					return x;
 				}
 			}
@@ -270,8 +280,13 @@
 				return (l.source._id === node._id || l.target._id === node._id);
 			});
 			toSplice.map(function(l) {
-				graph.d3_links.splice(graph.d3_links.indexOf(l), 1);
-				graph.links.splice(graph.links.indexOf(l), 1) 
+				var link = graph.node_lut[l._id];
+				var position_sel = graph.selection.indexOf(link);
+
+				if(position_sel === -1){
+					graph.d3_links.splice(graph.d3_links.indexOf(l), 1);
+					graph._removeNode(link);
+				}
 			});
 		}
 	}
@@ -298,15 +313,27 @@
 					node_pressed.call(graph.node_lut[d._id], d3.event);
 				}
 			})
-			.on("mouseover", function(d) {
+			.on("mouseenter", function(d) {
+				graph.getShape(graph.node_lut[d._id]).classList.add("hover");
+				graph.force.stop();
 				path.style("marker-end",  "url(#arrowO)")
 			})
-			.on("mouseout", function(d) {
-				path.style("marker-end",  "url(#arrowD)")
+			.on("mouseleave", function(d) {
+				graph.force.resume(); 
+				graph.getShape(graph.node_lut[d._id]).classList.remove("hover");
+				if(graph.selection.indexOf(graph.node_lut[d._id]) == -1){
+					path.style("marker-end",  "url(#arrowD)");
+				}
+				else
+				{
+					graph.getShape(graph.node_lut[d._id]).classList.add("selected");
+					path.style("marker-end",  "url(#arrowS)");
+				}
 			});
 
 		//for delete elements in the DOM if they are more elements DOM than number links-data
-		this.svgLinks.exit().remove(); 
+		this.svgLinks.exit().remove();
+
 
 		// add new nodes
 		this.svgNodes = this.svgNodes.data( this.d3_nodes, function(d){
@@ -432,12 +459,16 @@
 		
 
 		g.on("mouseenter", function(d) {
+			graph.force.stop();
 			graph.showConnections(graph.node_lut[d._id]);
+			graph.getShape(graph.node_lut[d._id]).classList.add("hover");
 //			tools.style({opacity:'1.0'});
 			tools.style({display:'block'});
 		});
 		g.on("mouseleave", function(d) {
+			graph.force.resume();
 			graph.unhighlightElements();
+			graph.getShape(graph.node_lut[d._id]).classList.remove("hover");
 //			tools.style({opacity:'0.0'});
 			tools.style({display:'none'});
 		});
