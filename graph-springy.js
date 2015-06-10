@@ -238,13 +238,13 @@
 					{
 						edge.shape.setAttribute('marker-end', 'url(#arrowTimealert)' );
 						edge.shape.setAttribute('class', 'timealert' );
-						edge.shape.setAttribute('style', edge.data.style);
 						//edge.source.shape.style.stroke = 'red';
 						//edge.source.shape.style.strokeWidth = '1';
 					}
 					else
 					{
 						edge.shape.setAttribute('marker-end', 'url(#arrowD)' );
+						edge.shape.setAttribute('style', edge.data.style);
 					}
 					edge.shape.addEventListener( 'click', function(e){
   						if(window['node_pressed']){
@@ -314,10 +314,10 @@
 				{
 					a = document.createElementNS("http://www.w3.org/2000/svg", 'a');
 					a.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#' + node.data._id );
+					a.setAttribute('style', node.data.style);
 					var circleBG = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
 					circleBG.setAttribute('class','nodeBG');
 					circleBG.setAttribute('r',springy_damas.ray);
-					circleBG.setAttribute('style', node.data.style);
 					a.appendChild(circleBG);
 
 					var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');

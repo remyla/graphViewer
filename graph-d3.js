@@ -303,8 +303,9 @@
 		// add new links
 		var path = this.svgLinks.enter().append("svg:path")
 			.attr("class", function(d){ d.shape = this; return "link" })
-//			.style("marker-end",  "url(#arrowD)")
-			.attr("style", function(d){ return d.style;})
+			.style("marker-end",  "url(#arrowD)")
+			// Need to fix key style on links. setAttribute fct no working
+//			.attr("style", function(d){ return d.style;})
 			.on("click", function(d, l) {
 				if (d3.event.defaultPrevented) return; // click suppressed
 				if(window['node_pressed']){
@@ -317,7 +318,7 @@
 				path.style("marker-end",  "url(#arrowO)")
 			})
 			.on("mouseleave", function(d) {
-				graph.force.resume(); 
+				graph.force.resume();
 				graph.getShape(graph.node_lut[d._id]).classList.remove("hover");
 				if(graph.selection.indexOf(graph.node_lut[d._id]) == -1){
 					path.style("marker-end",  "url(#arrowD)");
@@ -340,7 +341,8 @@
 		
 		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
 				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
-				.on("drag", function(d) { graph.drag(); }));
+				.on("drag", function(d) { graph.drag(); }))
+				.attr("style", function(d){ return d.style;});
 		
 		var tools = g.append('svg:g')
 			.attr("class", "tools")
@@ -380,8 +382,7 @@
 		
 		g.append("circle")
 			.attr("r", 10)
-			.attr("class", function(d){ d.shape = this; return "nodeBG"})
-			.attr("style", function(d){ return d.style;});
+			.attr("class", function(d){ d.shape = this; return "nodeBG"});
 		
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumbCirc"+d._id; })
@@ -431,7 +432,7 @@
 			.data(this.nodes)
 			.enter().append( function(d){
 				return graph.nodePattern(d);
-		});
+			});
 
 		g.on("mouseenter", function(d) {
 			graph.force.stop();
