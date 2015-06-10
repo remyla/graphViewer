@@ -361,6 +361,16 @@
 			.style("stroke-width", 0.5)
 			.attr('fill', 'white');
 
+		var pin = tools.append("circle")
+			.attr('r', 3)
+			.attr('cx', '0')
+			.attr('cy', '-12')
+			.style("stroke", "white")
+			.style("stroke-width", 0.5)
+			.style('fill', 'white')
+			.style("fill", "url(#imagePin");
+
+
 		var openPlus = tools.append("svg:image")
 			.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
 			.attr("class", "openPlus")
@@ -369,6 +379,25 @@
 			.attr('width', 3.5)
 			.attr('height', 3.5);
 		
+		var pin2 = tools.append("svg:image")
+			.attr('xlink:href', "scripts/graphViewer/icons/pin.svg")
+			.attr("class", "pin")
+			.attr('x', '-1.75')
+			.attr('y', '-14')
+			.attr('width', 3.5)
+			.attr('height', 3.5)
+			.on('click', function(d){
+				if(d.fixed === true || d.fixed === 1){
+					d3.select(this).attr('xlink:href', "scripts/graphViewer/icons/pin.svg")
+					d.fixed = false;
+					graph.restart();
+				}
+				else{
+					d3.select(this).attr('xlink:href', "scripts/graphViewer/icons/pin-selected.svg")
+					d.fixed = true;
+				}
+			});
+
 		g.append("circle")
 			.attr("r", 10)
 			.attr("class", function(d){ d.shape = this; return "nodeBG"});
