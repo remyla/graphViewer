@@ -20,7 +20,7 @@
 
 	//damasGraph.prototype.init = function ( htmlelem )
 	damasGraph.prototype.init = function ( htmlelem )
-	{
+	{ 	
 		this.springy_graph = new Springy.Graph();
 		this.springy_layout = new Springy.Layout.ForceDirected(this.springy_graph, 300.0, 300.0, 0.5);
 		this.svg = this.init_SVG();
@@ -29,6 +29,11 @@
 		this.svgpanzoominstance = svgPanZoom('#svggraph', { minZoom: 0.1, maxZoom: 10 } );
 		springy_damas.currentBB = this.springy_layout.getBoundingBox();
 		this.springy_renderer = springy_damas.get_renderer( this.springy_layout );
+		htmlelem.addEventListener('mousemove', function(e){
+    		if(graph.selection.length == 0)
+				return;
+			graph.springy_renderer.stop();
+    	});
 		this.springy_renderer.start();
 	}
 
@@ -49,24 +54,68 @@
 		{
 			var springy_source_id = this.springy_lut[l['src_id']].id;
 			var springy_target_id = this.springy_lut[l['tgt_id']].id;
-			var springy_source_node = this.springy_graph.nodes[springy_source_id];
-			var springy_target_node = this.springy_graph.nodes[springy_target_id];
+			var springy_source_node;
+			for(var x = 0; x < this.springy_graph.nodes.length; x++)
+			{
+				if( this.springy_graph.nodes[x].id === springy_source_id )
+					springy_source_node = this.springy_graph.nodes[x];
+			}
+			var springy_target_node;
+			for(var x = 0; x < this.springy_graph.nodes.length; x++)
+			{
+				if( this.springy_graph.nodes[x].id === springy_target_id )
+					springy_target_node = this.springy_graph.nodes[x];
+			}
+			/*var springy_source_node = this.springy_graph.nodes[springy_source_id];
+			var springy_target_node = this.springy_graph.nodes[springy_target_id];*/
 			var springy_edge = this.springy_graph.newEdge(springy_source_node, springy_target_node, l);
 			this.springy_lut[l._id] = springy_edge;
 			return true;
 		}
 		return false;
 	}
-
+	
+	/*
+	 * Function to delete an element (node or link)
+	 * @param {Object} node- Node damas
+	 */
 	damasGraph.prototype.removeNode = function( node ){
 
-		if (this._removeNode(node))
-		{
-			var dataNode = this.springy_lut[node._id];
-			var shape = dataNode.shape;
-			shape.parentNode.removeChild(shape);
-			var spr_graph = this.springy_graph;
-			(dataNode.source && dataNode.target) ? spr_graph.removeEdge( dataNode ) : spr_graph.removeNode( node );
+		var dataNode = this.springy_lut[node._id]; 
+		var shape = graph.getShape(this.node_lut[node._id]);
+		
+		if(!node.src_id && !node.tgt_id){ //Nodes
+			spliceLinksForNode(node);
+			var text = this.getText(this.node_lut[node._id]);
+
+			text.parentNode.removeChild(text);
+		}
+		
+		shape.parentNode.removeChild(shape);
+		delete this.springy_lut[node._id];
+
+		var spr_graph = this.springy_graph;
+		(dataNode.source && dataNode.target) ? spr_graph.removeEdge( dataNode ) : spr_graph.removeNode( dataNode );
+		
+		if(this._removeNode(node))
+			return true;
+
+		function spliceLinksForNode(node) {
+			var links = graph.links;
+			var toSplice = links.filter(function(l) { 
+				return (l.src_id === node._id || l.tgt_id === node._id);
+			});
+			toSplice.map(function(l) {
+				var position = graph.selection.indexOf(graph.node_lut[l._id]);
+				var shape = graph.getShape(graph.node_lut[l._id]);
+				var link =  graph.node_lut[l._id];
+				if(position === -1)
+				{ 
+					shape.parentNode.removeChild(shape);
+					graph._removeNode(link);
+					delete graph.springy_lut[l._id];
+				}
+			});
 		}
 	}
 
@@ -82,6 +131,8 @@
 			if(search[x].id == dataNode.id)
 				figure = search[x].shape;
 		}
+		if(figure === undefined) //Already deleted by RemoveNode. If a node is deleted spryngy delete all links related
+			figure = dataNode.shape;
 		return figure; //shape
 	}
 
@@ -140,7 +191,7 @@
 			var shape = this.getShape(this.node_lut[nodes[x]._id]);
 			var text = this.getText(this.node_lut[nodes[x]._id]); 
 		
-			if(this.getShape(node).classList.contains("select_orange"))
+			if(this.getShape(node).classList.contains("highlight"))
 				this._highlightSelectedOrange(node);
 
 			if(shape.classList.contains("withOpacity"))
@@ -187,19 +238,36 @@
 					{
 						edge.shape.setAttribute('marker-end', 'url(#arrowTimealert)' );
 						edge.shape.setAttribute('class', 'timealert' );
-						console.log(edge.source);
 						//edge.source.shape.style.stroke = 'red';
 						//edge.source.shape.style.strokeWidth = '1';
 					}
 					else
 					{
-						edge.shape.setAttribute('marker-end', 'url(#arrow)' );
+						edge.shape.setAttribute('marker-end', 'url(#arrowD)' );
 						edge.shape.setAttribute('style', edge.data.style);
 					}
 					edge.shape.addEventListener( 'click', function(e){
   						if(window['node_pressed']){
 	  						node_pressed.call(this, e);
    						}
+    				}.bind(graph.node_lut[edge.data._id]));
+    				edge.shape.addEventListener( 'mouseover', function(e){
+    					graph.getShape(graph.node_lut[this._id]).classList.add("hover");
+    					graph.springy_renderer.stop();
+    					edge.shape.style["marker-end"] = "url(#arrowO)";
+    				}.bind(graph.node_lut[edge.data._id]));
+    				
+    				edge.shape.addEventListener( 'mouseout', function(e){ 
+    					graph.springy_renderer.start();
+    					graph.getShape(graph.node_lut[this._id]).classList.remove("hover");
+		  				if(graph.selection.indexOf(graph.node_lut[this._id]) == -1){
+		  					edge.shape.style["marker-end"] = "url(#arrowD)";
+						}
+						else
+						{
+							graph.getShape(graph.node_lut[this._id]).classList.add("selected");
+							edge.shape.style["marker-end"] = "url(#arrowS)";
+						}
     				}.bind(graph.node_lut[edge.data._id]));
 				}
 				var s1 = springy_damas.toScreen(p1);
@@ -347,10 +415,12 @@
 
 					//Add listeners for get the connections
 					a.addEventListener( 'mouseenter', function(e){ 
+						graph.springy_renderer.stop();
 						graph.showConnections(this);
 					}.bind(graph.node_lut[node.data._id]));
 
 					a.addEventListener( 'mouseleave', function(e){
+						graph.springy_renderer.start();
 						graph.unhighlightElements();
 					});
 				}
