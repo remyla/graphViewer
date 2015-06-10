@@ -51,7 +51,6 @@
 		this.d3_nodes = [];
 		this.d3_links = [];
 
-
 		this.drag = function()
 		{	d3.behavior.drag()
 			return this.force.drag()
@@ -79,7 +78,6 @@
 		this.svgNodes = d3.select(this.g2).selectAll('g');
 		this.svgLinks = d3.select(this.g1).selectAll('path');
 		this.force.on("tick", this.tick);
-
 
 		this.refreshDebugFrame(htmlelem);
 	}
@@ -386,10 +384,10 @@
 			.attr("class", function(d){ d.shape = this; return "nodeBG"});
 		
 		g.append('svg:circle')
-			.attr("id", function(d) { return "thumb"+d._id; })
+			.attr("id", function(d) { return "thumbCirc"+d._id; })
 			.attr("r", 10)
 			.style("fill", function(d) {
-				return "url(#thumbPat"+d._id+")";
+				return "url(#thumb"+d._id+")";
 			})
 			.attr("class", "node");
 //		g.append('svg:image')
@@ -431,27 +429,10 @@
 		
 		var patImage = this.defs.selectAll("pattern")
 			.data(this.nodes)
-			.enter().append('svg:pattern')
-			.attr('patternContentUnits', 'objectBoundingBox')
-			.attr('id', function(d) {
-				return "thumbPat"+d._id;
-			})
-			.attr('x', '0')
-			.attr('y', '0')
-			.attr('width', 1)
-			.attr('height', 1);
+			.enter().append( function(d){
+				return graph.nodePattern(d);
+			});
 
-		var image = patImage.append('image')
-			.attr('id','thumbnail')
-			.attr('xlink:href', function(d) {
-				return d.image;
-			})
-			.attr('x', '0')
-			.attr('y', '0')
-			.attr('width', 1)
-			.attr('height', 1);
-//			.attr('preserveAspectRatio', 'xMidYMid slice');
-		
 		g.on("mouseenter", function(d) {
 			graph.force.stop();
 			graph.showConnections(graph.node_lut[d._id]);

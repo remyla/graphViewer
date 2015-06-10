@@ -345,33 +345,7 @@
 					var image = node.data.image;
 					if (image)
 					{
-						pattern = document.createElementNS("http://www.w3.org/2000/svg", 'pattern');
-						graph.defs.appendChild(pattern);
-						pattern.setAttribute('id', 'thumb'+node.data._id);
-						pattern.setAttribute('patternContentUnits', 'objectBoundingBox');
-						pattern.setAttribute('x', '0');
-						pattern.setAttribute('y', '0');
-						pattern.setAttribute('width', 1);
-						pattern.setAttribute('height', 1);
-						pattern.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-						var svgimage = document.createElementNS("http://www.w3.org/2000/svg", 'image');
-						pattern.appendChild( svgimage );
-						svgimage.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', image );
-						svgimage.setAttribute('x', '0');
-						svgimage.setAttribute('y', '0');
-						svgimage.setAttribute('width', '1');
-						svgimage.setAttribute('height', '1');
-						svgimage.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-						/*
-						var c = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-						c.setAttribute('x', '0');
-						c.setAttribute('y', '0');
-						c.setAttribute('width', '1');
-						c.setAttribute('height', '1');
-						c.setAttribute('fill', 'none');
-						pattern.appendChild( c );
-						*/
-//						circle.setAttribute('fill','url(#thumb'+node.data._id+')');
+						graph.defs.appendChild(graph.nodePattern(node.data));
 						circle.style.fill = 'url(#thumb'+node.data._id+')';
 					}
 					
@@ -397,7 +371,7 @@
 					{
 
 					}
-					
+
 //					node.plus = document.createElementNS("http://www.w3.org/2000/svg", 'image');
 //					a.appendChild(node.plus);
 //					node.plus.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'scripts/graphViewer/icons/plus25.svg');
