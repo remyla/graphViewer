@@ -315,7 +315,8 @@
 		
 		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
 				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
-				.on("drag", function(d) { graph.drag(); }));
+				.on("drag", function(d) { graph.drag(); }))
+				.attr("style", function(d){ return d.style;});
 		
 		var tools = g.append('svg:g')
 			.attr("class", "tools")
@@ -355,8 +356,7 @@
 		
 		g.append("circle")
 			.attr("r", 10)
-			.attr("class", function(d){ d.shape = this; return "nodeBG"})
-			.attr("style", function(d){ return d.style;});
+			.attr("class", function(d){ d.shape = this; return "nodeBG"});
 		
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumb"+d._id; })

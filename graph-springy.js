@@ -246,10 +246,10 @@
 				{
 					a = document.createElementNS("http://www.w3.org/2000/svg", 'a');
 					a.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#' + node.data._id );
+					a.setAttribute('style', node.data.style);
 					var circleBG = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
 					circleBG.setAttribute('class','nodeBG');
 					circleBG.setAttribute('r',springy_damas.ray);
-					circleBG.setAttribute('style', node.data.style);
 					a.appendChild(circleBG);
 
 					var circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
