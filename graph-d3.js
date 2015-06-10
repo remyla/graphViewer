@@ -304,7 +304,8 @@
 		var path = this.svgLinks.enter().append("svg:path")
 			.attr("class", function(d){ d.shape = this; return "link" })
 			.style("marker-end",  "url(#arrowD)")
-			.attr("style", function(d){ return d.style;})
+			// Need to fix key style on links. setAttribute fct no working
+//			.attr("style", function(d){ return d.style;})
 			.on("click", function(d, l) {
 				if (d3.event.defaultPrevented) return; // click suppressed
 				if(window['node_pressed']){
@@ -317,7 +318,7 @@
 				path.style("marker-end",  "url(#arrowO)")
 			})
 			.on("mouseleave", function(d) {
-				graph.force.resume(); 
+				graph.force.resume();
 				graph.getShape(graph.node_lut[d._id]).classList.remove("hover");
 				if(graph.selection.indexOf(graph.node_lut[d._id]) == -1){
 					path.style("marker-end",  "url(#arrowD)");
