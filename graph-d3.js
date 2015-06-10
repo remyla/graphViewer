@@ -22,12 +22,6 @@
 			.attr("viewBox", "0 0 " + width + " " + height )
 			.attr("preserveAspectRatio", "xMidYMid meet")
 			.attr("pointer-events", "all")
-			.on('mousemove', function(){ 
-				if(graph.selection.length == 0){
-					return;
-				}
-				graph.force.stop();
-			})
 			.call(d3.behavior.zoom().on("zoom", rescale));
 
 		this.defs = d3.select("defs");
@@ -243,7 +237,7 @@
 	damasGraph.prototype.removeNode = function( node ){
 		var shape = this.getShape(node);
 		var remove , pos;
-		
+		var nodeLinks;
 		if(node.src_id && node.tgt_id)
 		{
 			remove = this.d3_links;
@@ -255,7 +249,18 @@
 			remove = this.d3_nodes ;
 			pos = search(remove);
 			remove.splice(pos, 1);
-			spliceLinksForNode(node);
+			var nodeLinksFrom = this._getNodeLinksFrom(node); //Links source
+			var nodeLinksTo = this._getNodeLinksTo(node); //Links target
+			nodeLinks = nodeLinksFrom.concat(nodeLinksTo); //Concat two arrays (source & target)
+			nodeLinks.map(function(l) {
+				var link = graph.node_lut[l._id];
+				var position_sel = graph.selection.indexOf(link);
+
+				if(position_sel === -1){
+					graph.d3_links.splice(graph.d3_links.indexOf(l), 1);
+					graph._removeNode(link);
+				}
+			});
 		}
 		
 		if(this._removeNode(node)){
@@ -270,22 +275,6 @@
 					return x;
 				}
 			}
-		}
-		
-		function spliceLinksForNode(node) {
-			var links = graph.links;
-			var toSplice = graph.d3_links.filter(function(l) { 
-				return (l.source._id === node._id || l.target._id === node._id);
-			});
-			toSplice.map(function(l) {
-				var link = graph.node_lut[l._id];
-				var position_sel = graph.selection.indexOf(link);
-
-				if(position_sel === -1){
-					graph.d3_links.splice(graph.d3_links.indexOf(l), 1);
-					graph._removeNode(link);
-				}
-			});
 		}
 	}
 
