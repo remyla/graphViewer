@@ -14,6 +14,7 @@
 		this.links = [];
 		this.selection = [];
 		this.node_lut = {};
+		this.dragging = false;
 		this.initDebugFrame(document.querySelector('#graphDebug'));
 		this.init(htmlelem);
 		this.refreshDebugFrame();
@@ -289,6 +290,7 @@
 
 	damasGraph.prototype._newEdge = function( node )
 	{
+		if (this.node_lut[node._id]) return false;
 		this.links.push(node);
 		this.node_lut[node._id] = node;
 		this.refreshDebugFrame();
