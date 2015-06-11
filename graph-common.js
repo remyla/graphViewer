@@ -14,6 +14,7 @@
 		this.links = [];
 		this.selection = [];
 		this.node_lut = {};
+		this.dragging = false;
 		this.initDebugFrame(document.querySelector('#graphDebug'));
 		this.init(htmlelem);
 		this.refreshDebugFrame();

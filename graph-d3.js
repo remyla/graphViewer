@@ -54,6 +54,7 @@
 		}
 
 		function dragstarted(d) {
+			graph.dragging = true;
 			d3.event.sourceEvent.stopPropagation();
 			d3.select(this).classed("dragging", true);
 			//graph.force.start();
@@ -64,6 +65,7 @@
 		}
 
 		function dragended(d) {
+			graph.dragging = false;
 			d3.select(this).classed("dragging", false);
 		}
 
@@ -302,11 +304,13 @@
 				}
 			})
 			.on("mouseenter", function(d) {
+				if(graph.dragging){return;}
 				graph.getShape(graph.node_lut[d._id]).classList.add("hover");
 				graph.force.stop();
 				path.style("marker-end",  "url(#arrowO)")
 			})
 			.on("mouseleave", function(d) {
+				if(graph.dragging){return;}
 				graph.force.resume();
 				graph.getShape(graph.node_lut[d._id]).classList.remove("hover");
 				if(graph.selection.indexOf(graph.node_lut[d._id]) == -1){
@@ -329,7 +333,7 @@
 		});
 		
 		var g = this.svgNodes.enter().append('svg:a').call(graph.force.drag()
-				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
+				.on("dragstart", function(d){ graph.dragging = true; d3.event.sourceEvent.stopPropagation(); })
 				.on("drag", function(d) { graph.drag(); }))
 				.attr("style", function(d){ return d.style;})
 				.attr('xlink:href', function(d){ return "#"+ d._id;});
@@ -449,13 +453,16 @@
 			});
 
 		g.on("mouseenter", function(d) {
+			if(graph.dragging){return;}
 			graph.force.stop();
 			graph.showConnections(graph.node_lut[d._id]);
+			graph.getShape(graph.node_lut[d._id]).classList.remove("highlight");
 			graph.getShape(graph.node_lut[d._id]).classList.add("hover");
 //			tools.style({opacity:'1.0'});
 			tools.style({display:'block'});
 		});
 		g.on("mouseleave", function(d) {
+			if(graph.dragging){return;}
 			graph.force.resume();
 			graph.unhighlightElements();
 			graph.getShape(graph.node_lut[d._id]).classList.remove("hover");
