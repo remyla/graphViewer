@@ -22,12 +22,6 @@
 			.attr("viewBox", "0 0 " + width + " " + height )
 			.attr("preserveAspectRatio", "xMidYMid meet")
 			.attr("pointer-events", "all")
-			.on('mousemove', function(){ 
-				if(graph.selection.length == 0){
-					return;
-				}
-				graph.force.stop();
-			})
 			.call(d3.behavior.zoom().on("zoom", rescale));
 
 		this.defs = d3.select("defs");
@@ -339,10 +333,11 @@
 			return d._id;
 		});
 		
-		var g = this.svgNodes.enter().append('svg:g').call(graph.force.drag()
+		var g = this.svgNodes.enter().append('svg:a').call(graph.force.drag()
 				.on("dragstart", function(d){ d3.event.sourceEvent.stopPropagation(); })
 				.on("drag", function(d) { graph.drag(); }))
-				.attr("style", function(d){ return d.style;});
+				.attr("style", function(d){ return d.style;})
+				.attr('xlink:href', function(d){ return "#"+ d._id;});
 		
 		var tools = g.append('svg:g')
 			.attr("class", "tools")
@@ -352,31 +347,31 @@
 			.attr('r', 3)
 			.attr('cx', '-8.5')
 			.attr('cy', '8.5')
-			.style("stroke", "white")
-			.style("stroke-width", 0.5)
-			.attr('fill', 'white');
+//			.style("stroke", "white")
+//			.style("stroke-width", 0.5)
+			.attr('fill', "white");
 
 		var shareCircle = tools.append("circle")
 			.attr('r', 3)
 			.attr('cx', '-12')
 			.attr('cy', '0')
-			.style("stroke", "white")
-			.style("stroke-width", 0.5)
+//			.style("stroke", "white")
+//			.style("stroke-width", 0.5)
 			.attr('fill', 'white');
 
 		var deleteCircle = tools.append("circle")
 			.attr('r', 3)
 			.attr('cx', '-8.5')
 			.attr('cy', '-8.5')
-			.style("stroke", "white")
-			.style("stroke-width", 0.5)
+//			.style("stroke", "white")
+//			.style("stroke-width", 0.5)
 			.attr('fill', 'white');
 
 		var openPlus = tools.append("svg:image")
 			.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
 			.attr("class", "openPlus")
 			.attr('x', '-10.25')
-			.attr('y', '7')
+			.attr('y', '6.75')
 			.attr('width', 3.5)
 			.attr('height', 3.5);
 		
@@ -414,11 +409,6 @@
 		g.append(function(d){
 			return graph.nodeText(d);
 		});
-
-		g.append("a")
-			.attr('xlink:href', function(d) {
-				return '#'+d._id;
-			});
 
 		g.on("click", function(d) {
 			if (d3.event.defaultPrevented) return; // click suppressed

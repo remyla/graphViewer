@@ -1,8 +1,4 @@
-#svggraph {
-	width: 100%;
-	height: 100%;
-}
-
+/*
 #grid {
 	width: 10px;
 	height: 10px;
@@ -32,108 +28,10 @@
 	width: 100%;
 	height: 100%
 }
-
-.axis {
-	stroke: red;
-	stroke-width: 0.2;
-}
-
-.node {
-/*
-	stroke: #fff;
-	stroke-width: 1px;
 */
-}
-	
-.nodeBG {
-/*
-	stroke: #000;
-	stroke-width: 1px;
-*/
-	-webkit-filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.5));
-	filter: drop-shadow(0px 1px .5px rgba(0,0,0,0.5));
-}
 
 .icon {
 	width: 2px;
 	height: 2px;
 }
-.tools {
-	transition: opacity 400ms ease;
-}
 
-.extText {
-	font: 6px arial;
-	fill: black;
-}
-.openPlus {
-	fill: gray;
-	cursor: pointer;
-}
-
-.label {
-	font: 6px arial;
-	pointer-events: none;
-/*	stroke:white;*/
-}
-
-circle {
-	transition: opacity 100ms ease;
-/*
-	stroke: #364E64;
-	stroke-width: 0.1;
-*/
-	cursor: pointer;
-}
-
-circle.asset {
-/*
-	stroke: red;
-*/
-}
-
-line {
-	transition: stroke 80ms ease;
-	stroke: #364E64;
-	stroke-width: 1.2;
-	cursor: alias;
-}
-/*
-#markerArrow {
-*/
-marker {
-	fill: #364E64;
-}
-marker#arrowTimealert {
-	fill: red;
-}
-line.timealert {
-	stroke: red;
-/*
-	animation: blinker 1s linear infinite;
-*/
-	-webkit-animation: blinker 1s linear infinite;
-}
-/*
-line.red marker {
-	fill: red !important;
-}
-*/
-line:hover {
-	stroke: #a3330a;
-	cursor: pointer;
-}
-
-circle:hover {
-	opacity: 0.7;
-}
-@keyframes blinker {
-	0% { opacity: 1.0; }
-	50% { opacity: 0.0; }
-	100% { opacity: 1.0; }
-}
-@-webkit-keyframes blinker {
-	0% { opacity: 1.0; }
-	50% { opacity: 0.0; }
-	100% { opacity: 1.0; }
-}

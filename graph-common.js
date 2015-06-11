@@ -344,7 +344,7 @@
 		markerD.setAttribute('id', 'arrowD' );
 		markerD.setAttribute('markerWidth', '6' );
 		markerD.setAttribute('markerHeight', '6' );
-		markerD.setAttribute('refX', '3' );
+		markerD.setAttribute('refX', '5' );
 		markerD.setAttribute('refY', '3' );
 		markerD.setAttribute('orient', 'auto' );
 		markerD.setAttribute('markerUnits', 'strokeWidth' );
@@ -357,7 +357,7 @@
 		markerS.setAttribute('id', 'arrowS' );
 		markerS.setAttribute('markerWidth', '6' );
 		markerS.setAttribute('markerHeight', '6' );
-		markerS.setAttribute('refX', '3' );
+		markerS.setAttribute('refX', '5' );
 		markerS.setAttribute('refY', '3' );
 		markerS.setAttribute('orient', 'auto' );
 		markerS.setAttribute('markerUnits', 'strokeWidth' );
@@ -370,7 +370,7 @@
 		markerO.setAttribute('id', 'arrowO' );
 		markerO.setAttribute('markerWidth', '6' );
 		markerO.setAttribute('markerHeight', '6' );
-		markerO.setAttribute('refX', '3' );
+		markerO.setAttribute('refX', '5' );
 		markerO.setAttribute('refY', '3' );
 		markerO.setAttribute('orient', 'auto' );
 		markerO.setAttribute('markerUnits', 'strokeWidth' );
@@ -383,7 +383,7 @@
 		markerH.setAttribute('id', 'arrowH' );
 		markerH.setAttribute('markerWidth', '6' );
 		markerH.setAttribute('markerHeight', '6' );
-		markerH.setAttribute('refX', '3' );
+		markerH.setAttribute('refX', '5' );
 		markerH.setAttribute('refY', '3' );
 		markerH.setAttribute('orient', 'auto' );
 		markerH.setAttribute('markerUnits', 'strokeWidth' );
