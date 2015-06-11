@@ -55,7 +55,6 @@ circle.nodeBG {
 
 /* Links */
 g.edges {
-	pointer-events: none;
 }
 line {
 	transition: stroke 80ms ease;
