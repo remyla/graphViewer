@@ -107,14 +107,7 @@
 			if(node == nodeOrigin && counter != 0)
 				return;
 
-			function getLinksNeighbors( node ){
-				var lin = graph.links.filter(function(l) { 
-					return (l.src_id === node._id ); 
-				});
-				return lin;
-			}
-
-			var connections = getLinksNeighbors(node);
+			var connections = graph._getNodeLinksFrom(node);
 
 			var nodes = connections.map(function(l){
 				var idTarget = l.tgt_id;
@@ -138,7 +131,7 @@
 				if(data.related_nodes.indexOf(n._id) == -1){
 					data.related_nodes.push(n._id);
 					counter++;
-					if(getLinksNeighbors(n).length > 0)
+					if(graph._getNodeLinksFrom(n).length > 0)
 					{
 						getTargetsR(n);
 					}
@@ -146,6 +139,28 @@
 			}
 		}
 		return data;
+	}
+
+	/**
+	 * Method for get the links (source) related to node given. 
+	 * @param {Object} node - Array object (nodes generique)
+	 */
+	damasGraph.prototype._getNodeLinksFrom = function (node) {
+		var linksFrom = this.links.filter(function(l) {
+			return (l.src_id === node._id );
+		});
+		return linksFrom;
+	}
+
+	/**
+	 * Method for get the links (target) related to node given. 
+	 * @param {Object} node - Array object (nodes generique)
+	 */
+	damasGraph.prototype._getNodeLinksTo = function (node) {
+		var linksTo = this.links.filter(function(l) {
+			return ( l.tgt_id === node._id);
+		});
+		return linksTo;
 	}
 
 	/**

@@ -237,7 +237,7 @@
 	damasGraph.prototype.removeNode = function( node ){
 		var shape = this.getShape(node);
 		var remove , pos;
-		
+		var nodeLinks;
 		if(node.src_id && node.tgt_id)
 		{
 			remove = this.d3_links;
@@ -249,7 +249,18 @@
 			remove = this.d3_nodes ;
 			pos = search(remove);
 			remove.splice(pos, 1);
-			spliceLinksForNode(node);
+			var nodeLinksFrom = this._getNodeLinksFrom(node); //Links source
+			var nodeLinksTo = this._getNodeLinksTo(node); //Links target
+			nodeLinks = nodeLinksFrom.concat(nodeLinksTo); //Concat two arrays (source & target)
+			nodeLinks.map(function(l) {
+				var link = graph.node_lut[l._id];
+				var position_sel = graph.selection.indexOf(link);
+
+				if(position_sel === -1){
+					graph.d3_links.splice(graph.d3_links.indexOf(l), 1);
+					graph._removeNode(link);
+				}
+			});
 		}
 		
 		if(this._removeNode(node)){
@@ -264,22 +275,6 @@
 					return x;
 				}
 			}
-		}
-		
-		function spliceLinksForNode(node) {
-			var links = graph.links;
-			var toSplice = graph.d3_links.filter(function(l) { 
-				return (l.source._id === node._id || l.target._id === node._id);
-			});
-			toSplice.map(function(l) {
-				var link = graph.node_lut[l._id];
-				var position_sel = graph.selection.indexOf(link);
-
-				if(position_sel === -1){
-					graph.d3_links.splice(graph.d3_links.indexOf(l), 1);
-					graph._removeNode(link);
-				}
-			});
 		}
 	}
 
@@ -367,6 +362,16 @@
 //			.style("stroke-width", 0.5)
 			.attr('fill', 'white');
 
+		var pin = tools.append("circle")
+			.attr('r', 3)
+			.attr('cx', '0')
+			.attr('cy', '-12')
+			.style("stroke", "white")
+			.style("stroke-width", 0.5)
+			.style('fill', 'white')
+			.style("fill", "url(#imagePin");
+
+
 		var openPlus = tools.append("svg:image")
 			.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
 			.attr("class", "openPlus")
@@ -375,6 +380,25 @@
 			.attr('width', 3.5)
 			.attr('height', 3.5);
 		
+		var pin2 = tools.append("svg:image")
+			.attr('xlink:href', "scripts/graphViewer/icons/pin.svg")
+			.attr("class", "pin")
+			.attr('x', '-1.75')
+			.attr('y', '-14')
+			.attr('width', 3.5)
+			.attr('height', 3.5)
+			.on('click', function(d){
+				if(d.fixed === true || d.fixed === 1){
+					d3.select(this).attr('xlink:href', "scripts/graphViewer/icons/pin.svg")
+					d.fixed = false;
+					graph.restart();
+				}
+				else{
+					d3.select(this).attr('xlink:href', "scripts/graphViewer/icons/pin-selected.svg")
+					d.fixed = true;
+				}
+			});
+
 		g.append("circle")
 			.attr("r", 10)
 			.attr("class", function(d){ d.shape = this; return "nodeBG"});
