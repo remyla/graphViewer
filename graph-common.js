@@ -290,6 +290,7 @@
 
 	damasGraph.prototype._newEdge = function( node )
 	{
+		if (this.node_lut[node._id]) return false;
 		this.links.push(node);
 		this.node_lut[node._id] = node;
 		this.refreshDebugFrame();
