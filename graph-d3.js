@@ -16,13 +16,114 @@
 
 		var width = window.innerWidth;
 		var height = window.innerHeight;
+		var sel = []; //Temp array for rectangle selection
 		htmlelem.appendChild(this.svg);
 
 		svg = d3.select("#svggraph")
 			.attr("viewBox", "0 0 " + width + " " + height )
 			.attr("preserveAspectRatio", "xMidYMid meet")
 			.attr("pointer-events", "all")
-			.call(d3.behavior.zoom().on("zoom", rescale));
+			.on("mousedown", function(d){
+				if(! d3.event.shiftKey)
+					return;
+				graph.dragging = true;
+				//Stop zoom in selection
+				svg.call(graph.zoomm.on("zoom", null));
+
+				//Mouse position in gBox
+				var p = d3.mouse(graph.gBox);
+				p[0] = parseInt( p[0] , 10);
+				p[1] = parseInt( p[1] , 10);
+
+				//Rectangle for selection
+				d3.select(graph.gBox).append( "rect")
+				.attr({
+					rx: 6,
+					ry: 6,
+					class: "rect_selection",
+					x: p[0],
+					y: p[1],
+					width: 0,
+					height: 0
+				})
+			})
+			.on( "mousemove", function() {
+				if(!graph.dragging)
+					return;
+				svg.call(d3.behavior.zoom());
+				var s = svg.select("rect.rect_selection");
+
+				if( !s.empty()) {
+					var p =  d3.mouse(graph.gBox);
+					p[0] = parseInt( p[0] , 10);
+					p[1] = parseInt( p[1] , 10);
+					var d = {
+							x: parseInt( s.attr( "x"), 10),
+							y: parseInt( s.attr( "y"), 10),
+							width: parseInt( s.attr( "width"), 10),
+							height: parseInt( s.attr( "height"), 10)
+						},
+					move = {
+						x : p[0] - d.x,
+						y : p[1] - d.y
+					}
+					;
+
+					if( move.x < 1 || (move.x*2<d.width)) {
+						d.x = p[0];
+						d.width -= move.x;
+					} else {
+						d.width = move.x;
+					}
+
+					if( move.y < 1 || (move.y*2<d.height)) {
+						d.y = p[1];
+						d.height -= move.y;
+					} else {
+						d.height = move.y;
+					}
+
+					s.attr( d);
+
+				
+					var nodes = graph.d3_nodes;
+				
+					nodes.map(function(data, i){
+
+						var radius = data.shape.r.animVal.value;
+
+						if( (sel.indexOf(data._id) === -1) &&
+							(parseInt( data.x, 10)-radius >= d.x) && (parseInt( data.x, 10)+radius<=d.x+parseInt( d.width, 10)) &&
+							(parseInt( data.y, 10)-radius >= d.y) && (parseInt( data.y, 10)+radius<=d.y+parseInt( d.height, 10)) )
+						{
+								sel.push(data._id);
+						}
+					})
+				}
+			})
+			.on( "mouseup", function() {
+				if(!graph.dragging)
+					return;
+
+				for(var x = 0; x < sel.length; x++){
+					graph.selectToggle( graph.node_lut[ sel[x] ] );
+				}
+				
+				//Reset array
+				sel.length = 0;
+
+				graph.dragging = false;
+
+				// reassign zoom
+				svg.call(graph.zoomm.on("zoom", rescale));
+
+				// remove selection frame
+				svg.selectAll( "rect.rect_selection").remove();
+			})
+		;
+
+		this.zoomm = d3.behavior.zoom();
+		svg.call(this.zoomm.on("zoom", rescale));
 
 		this.defs = d3.select("defs");
 		var gBox = d3.select(this.gBox).attr("pointer-events", "all");
