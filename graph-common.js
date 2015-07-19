@@ -478,7 +478,7 @@
 		ext.setAttribute('dx', 0);
 		ext.setAttribute('dy', 2);
 		if (node.file && !node.image){
-			ext.textContent = node.file.split(".").pop().toUpperCase();
+			ext.textContent = node.file.split(".").pop().toUpperCase().substring(0,4);
 			return ext;
 		}
 		if (node.abbr){
