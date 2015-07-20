@@ -65,9 +65,13 @@
 			{
 				var n = json[i];
 				if(n.src_id && n.tgt_id)
+				{
 					this.newEdge(n);
+				}
 				else
+				{
 					this.newNode(n);
+				}
 			}
 			return;
 		}
@@ -280,17 +284,42 @@
 
 	damasGraph.prototype._newNode = function( node )
 	{
+		if (!node._id)
+		{
+			console.error('could not import node '+ JSON.stringify(node) );
+			return false;
+		}
 		if(node.id && !node._id) node._id = node.id; // backward compatibility
 		if (this.node_lut[node._id]) return false;
 		this.nodes.push(node);
 		this.node_lut[node._id] = node;
 		this.refreshDebugFrame();
+		console.log('node '+ JSON.stringify(node) );
 		return true;
 	}
 
 	damasGraph.prototype._newEdge = function( node )
 	{
-		if (this.node_lut[node._id]) return false;
+		if (!node.src_id || !node.tgt_id)
+		{
+			console.error('could not import link '+ JSON.stringify(node) );
+			return false;
+		}
+		if (!this.node_lut[node.src_id])
+		{
+			console.error('new link error: node not found '+ node.src_id );
+			return false;
+		}
+		if (!this.node_lut[node.tgt_id])
+		{
+			console.error('new link error: node not found '+ node.tgt_id );
+			return false;
+		}
+		if (this.node_lut[node._id])
+		{
+			return false;
+		}
+		console.log('link '+ JSON.stringify(node) );
 		this.links.push(node);
 		this.node_lut[node._id] = node;
 		this.refreshDebugFrame();
