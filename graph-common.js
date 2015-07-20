@@ -507,7 +507,7 @@
 		ext.setAttribute('dx', 0);
 		ext.setAttribute('dy', 2);
 		if (node.file && !node.image){
-			ext.textContent = node.file.split(".").pop().toUpperCase();
+			ext.textContent = node.file.split(".").pop().toUpperCase().substring(0,4);
 			return ext;
 		}
 		if (node.abbr){
@@ -519,24 +519,25 @@
 	}
 
 	damasGraph.prototype.nodePattern = function(node){
-		var image = node.image;
-		var id = node._id;
 		pattern = document.createElementNS("http://www.w3.org/2000/svg", 'pattern');
-		pattern.setAttribute('id', 'thumb'+id);
+		pattern.setAttribute('id', 'thumb'+node._id);
 		pattern.setAttribute('patternContentUnits', 'objectBoundingBox');
 		pattern.setAttribute('x', '0');
 		pattern.setAttribute('y', '0');
 		pattern.setAttribute('width', 1);
 		pattern.setAttribute('height', 1);
 		pattern.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-		var svgimage = document.createElementNS("http://www.w3.org/2000/svg", 'image');
-		svgimage.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', image );
-		svgimage.setAttribute('x', '0');
-		svgimage.setAttribute('y', '0');
-		svgimage.setAttribute('width', '1');
-		svgimage.setAttribute('height', '1');
-		svgimage.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-		pattern.appendChild( svgimage );
+		if (node.image)
+		{
+			var svgimage = document.createElementNS("http://www.w3.org/2000/svg", 'image');
+			svgimage.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', node.image );
+			svgimage.setAttribute('x', '0');
+			svgimage.setAttribute('y', '0');
+			svgimage.setAttribute('width', '1');
+			svgimage.setAttribute('height', '1');
+			svgimage.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+			pattern.appendChild( svgimage );
+		}
 		/*
 		var c = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
 		c.setAttribute('x', '0');

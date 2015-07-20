@@ -335,8 +335,8 @@
 		var g = this.svgNodes.enter().append('svg:a').call(graph.force.drag()
 				.on("dragstart", function(d){ graph.dragging = true; d3.event.sourceEvent.stopPropagation(); })
 				.on("drag", function(d) { graph.drag(); }))
-				.attr("style", function(d){ return d.style;})
-				.attr('xlink:href', function(d){ return "#"+ d._id;});
+				.attr("style", function(d){ return d.style;});
+				//.attr('xlink:href', function(d){ return "#"+ d._id;});
 		
 		var tools = g.append('svg:g')
 			.attr("class", "tools")
