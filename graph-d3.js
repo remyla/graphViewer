@@ -342,6 +342,7 @@
 			.attr("class", "tools")
 			.style('display', 'none');
 		
+/*
 		var openCircle = tools.append("circle")
 			.attr('r', 3)
 			.attr('cx', '-8.5')
@@ -365,17 +366,18 @@
 //			.style("stroke", "white")
 //			.style("stroke-width", 0.5)
 			.attr('fill', 'white');
+*/
 
 		var pin = tools.append("circle")
 			.attr('r', 3)
-			.attr('cx', '0')
-			.attr('cy', '-12')
+			.attr('cx', '-9')
+			.attr('cy', '-9')
 			.style("stroke", "white")
 			.style("stroke-width", 0.5)
-			.style('fill', 'white')
-			.style("fill", "url(#imagePin");
+			.style('fill', 'ddd');
 
 
+/*
 		var openPlus = tools.append("svg:image")
 			.attr('xlink:href', 'scripts/graphViewer/icons/plus25.svg')
 			.attr("class", "openPlus")
@@ -383,12 +385,28 @@
 			.attr('y', '6.75')
 			.attr('width', 3.5)
 			.attr('height', 3.5);
-		
+*/
+			
+		var pin2 = tools.append("svg:polygon")
+			.attr('transform', 'translate(-11, -11) scale(0.01)')
+			.attr("points", "291.282,268.509 384.723,169.25 294.709,191.246 151.04,58.874 151.04,0 0,154.527 68.258,150.821 190.529,301.642 176.224,382.492 266.059,290.545 478.165,478.165")
+			.on('click', function(d){
+				if(d.fixed === true || d.fixed === 1){
+					d.fixed = false;
+					graph.restart();
+				}
+				else{
+					d.fixed = true;
+				}
+			});
+
+/*
 		var pin2 = tools.append("svg:image")
-			.attr('xlink:href', "scripts/graphViewer/icons/pin.svg")
+			.attr('xlink:href', "icons/pin.svg")
+			//.attr('xlink:href', "scripts/graphViewer/icons/pin.svg")
 			.attr("class", "pin")
-			.attr('x', '-1.75')
-			.attr('y', '-14')
+			.attr('x', '-10.5')
+			.attr('y', '-10.5')
 			.attr('width', 3.5)
 			.attr('height', 3.5)
 			.on('click', function(d){
@@ -402,6 +420,7 @@
 					d.fixed = true;
 				}
 			});
+*/
 
 		g.append("circle")
 			.attr("r", 10)

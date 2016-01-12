@@ -15,7 +15,7 @@
 		this.selection = [];
 		this.node_lut = {};
 		this.dragging = false;
-		this.initDebugFrame(document.querySelector('#graphDebug'));
+		this.initDebugFrame(document);
 		this.init(htmlelem);
 		this.refreshDebugFrame();
 	}
@@ -294,7 +294,7 @@
 		this.nodes.push(node);
 		this.node_lut[node._id] = node;
 		this.refreshDebugFrame();
-		console.log('node '+ JSON.stringify(node) );
+		//console.log('node '+ JSON.stringify(node) );
 		return true;
 	}
 
@@ -319,7 +319,7 @@
 		{
 			return false;
 		}
-		console.log('link '+ JSON.stringify(node) );
+		//console.log('link '+ JSON.stringify(node) );
 		this.links.push(node);
 		this.node_lut[node._id] = node;
 		this.refreshDebugFrame();
@@ -341,8 +341,8 @@
 	{
 		this.debug = {};
 		if(!htmlelem) return;
-		var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> node(s)<br/><span id="graphDebugNbEdges">?</span> edge(s)<br/><span id="graphDebugNbSelection">?</span> selected<br/><div id="graphDebugFileKeys"></div>';
-		htmlelem.innerHTML = c;
+		//var c = 'DEBUG:<br/><span id="graphDebugNbNodes">?</span> node(s)<br/><span id="graphDebugNbEdges">?</span> edge(s)<br/><span id="graphDebugNbSelection">?</span> selected<br/><div id="graphDebugFileKeys"></div>';
+		//htmlelem.innerHTML = c;
 		this.debug.nbNodes = htmlelem.querySelector('#graphDebugNbNodes');
 		this.debug.nbEdges = htmlelem.querySelector('#graphDebugNbEdges');
 		this.debug.nbSelection = htmlelem.querySelector('#graphDebugNbSelection');

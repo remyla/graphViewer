@@ -14,10 +14,13 @@ g.hidden {
 	display: none;
 }
 .hover {
-	stroke : green !important;
+	stroke : yellow !important;
 }
 .selected {
-	stroke : red !important;
+	fill : #0af !important;
+}
+.selected.link {
+	stroke : #0af !important;
 }
 .highlight {
 	stroke : orange !important;
@@ -36,18 +39,20 @@ g.hidden {
 }
 /* Texts */
 g.texts {
-	font: 4px sans-serif;
+	font: 4px monospace;
 	pointer-events: none;
 }
 
 /* Nodes */
 circle.nodeBG {
-	fill:#dddddd;
+	fill:#888;
+	fill: #364E64;
 }
 .extText {
-	fill: black;
-	font: 6px sans-serif;
+	fill: white;
+	font-size: 6px;
 	cursor: pointer;
+	font-family: monospace;
 }
 .tools circle {
 	fill: #dddddd;
@@ -71,10 +76,10 @@ line {
 	fill: #364E64;
 }
 #arrowO {
-	fill: green;
+	fill: yellow;
 }
 #arrowS {
-	fill: red;
+	fill: #0af;
 }
 #arrowH {
 	fill: orange;
