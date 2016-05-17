@@ -64,6 +64,7 @@
 			for(i=0;i<json.length;i++)
 			{
 				var n = json[i];
+				if(!n) continue;
 				if(n.src_id && n.tgt_id)
 				{
 					this.newEdge(n);

@@ -5,6 +5,7 @@ div#graph svg {
 }
 div#graphDebug {
 	font-family: monospace;
+	padding: 1ex;
 }
 .axis {
 	stroke: red;
