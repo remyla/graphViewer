@@ -429,10 +429,13 @@
 		g.append('svg:circle')
 			.attr("id", function(d) { return "thumbCirc"+d._id; })
 			.attr("r", 10)
+/*
 			.style("fill", function(d) {
 				return "url(#thumb"+d._id+")";
 			})
-			.attr("class", "node");
+*/
+			//.attr("class", "node " + d._id.split(/_/)[0]);
+			.attr("class", function(d) { return "node " + d._id.split(/_|\//)[0]});
 //		g.append('svg:image')
 //			.attr('id', function(d) { return "thumb"+d.id; })
 //			.attr('xlink:href', function(d) {return  thumbnail(d);})
@@ -447,7 +450,8 @@
 			.attr("dx", 12)
 			.attr("dy", ".35em")
 			.text(function(d) {
-				return (d.file)? d.file.split('/').pop() : d._id;
+				return d.name || d._id;
+				//return (d.file)? d.file.split('/').pop() : d._id;
 			});
 
 		//for delete elements in the DOM if they are more elements DOM than number svgLabels-data

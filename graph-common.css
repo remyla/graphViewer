@@ -114,3 +114,31 @@ line.red marker {
 	50% { opacity: 0.0; }
 	100% { opacity: 1.0; }
 }
+
+
+/***
+
+
+NEW
+
+***/
+
+
+.node {
+}
+
+.node.vol,
+.node.sit {
+fill: lightgreen;
+}
+
+.trk {
+	fill: lightblue;
+}
+
+.node.hub {
+	fill: green;
+}
+.node.usr {
+	fill: pink;
+}
