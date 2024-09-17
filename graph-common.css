@@ -103,7 +103,32 @@ line.red marker {
 /*line:hover {
 	stroke: #a3330a;
 }*/
+rect.rect_selection {
+    stroke          : red;
+    stroke-dasharray: 4px;
+    stroke-opacity  : 0.8;
+    fill            : transparent;
+}
+/* disable text selection */
+svg *::selection {
+    background : transparent;
+}
 
+svg *::-moz-selection {
+    background:transparent;
+}
+.extText {
+    -moz-user-select: none;
+    -ms-user-select: none; /* Internet Explorer */
+   -khtml-user-select: none; /* KHTML browsers (e.g. Konqueror) */
+  -webkit-user-select: none; /* Chrome, Safari, and Opera */
+  -webkit-touch-callout: none; /* Disable Android and iOS callouts*/
+}
+
+
+svg *::-webkit-selection {
+    background:transparent;
+	}
 @keyframes blinker {
 	0% { opacity: 1.0; }
 	50% { opacity: 0.0; }
